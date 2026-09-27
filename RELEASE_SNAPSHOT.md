@@ -23,7 +23,10 @@ local environment files, credentials and private PineScript sources. Alpha Edge
 Intelligence is a separate application and is not included.
 
 The README publication notice, this provenance document and contributor credits
-are snapshot-specific additions. Fly configuration files are unconfigured public
+are snapshot-specific additions. Release verification also updates the demo smoke
+test to scope company names to Positions and explicitly enable optional Q1 groups;
+these test corrections do not change application behaviour.
+Fly configuration files are unconfigured public
 templates. No deployment credentials or connections are transferred, and existing
 hosted environments continue to use their original release process.
 

@@ -90,7 +90,11 @@ try {
     console.log('PASS: real browser passkey enrollment/login, reload, CSRF, logout, limited recovery, replacement and revocation.');
 
     const demoContext = await browser.newContext();
-    await demoContext.addInitScript(() => localStorage.setItem('alpha-edge:welcome-guide:v1:demo', 'dismissed'));
+    await demoContext.addInitScript(() => {
+        localStorage.setItem('alpha-edge:welcome-guide:v1:demo', 'dismissed');
+        // Exercise the optional grouping explicitly; the public demo defaults it off.
+        localStorage.setItem('terminal-positions-visibility:demo', JSON.stringify({ showPositionBucketRows: true }));
+    });
     const demoPage = await demoContext.newPage();
     await demoPage.addInitScript(() => localStorage.setItem('terminal-cached-data',JSON.stringify({portfolio:{totalValue:999999,cashOnHand:1},stocks:[{id:999,name:'PRIVATE_CACHE_SENTINEL',symbol:'SECRET',positionValue:999999}]})));
     const demoErrors = []; const external = []; const failed = [];
@@ -103,14 +107,15 @@ try {
         await demoPage.waitForTimeout(500);
         assert.ok(!(await demoPage.locator('body').innerText()).includes('PRIVATE_CACHE_SENTINEL'));
         if(route==='positions') {
-            await demoPage.getByText('BHP Group Limited',{exact:true}).first().waitFor();
-            await demoPage.getByText('Banks (6)',{exact:true}).waitFor();
-            await demoPage.getByText('VanEck Australian Banks ETF',{exact:true}).first().waitFor();
-            const text = await demoPage.locator('.positions-grid tbody').innerText();
+            const positions = demoPage.locator('.positions-grid tbody');
+            await positions.getByText('BHP Group Limited',{exact:true}).waitFor();
+            await positions.getByText('Banks (6)',{exact:true}).waitFor();
+            await positions.getByText('VanEck Australian Banks ETF',{exact:true}).waitFor();
+            const text = await positions.innerText();
             assert.ok(text.includes('Q1-Defensive'));
             assert.ok(text.includes('Q1-Exempt'));
             assert.ok(text.indexOf('Q1-Defensive') < text.indexOf('Consumer Staples (2)'));
-            assert.ok(text.indexOf('Q1-Exempt') < text.indexOf('Energy Producers (2)'));
+            assert.ok(text.indexOf('Q1-Exempt') < text.indexOf('Energy Producers (3)'));
         }
         if(route==='system') {
             await demoPage.getByRole('button',{name:'Asset classes',exact:true}).click();
