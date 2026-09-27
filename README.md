@@ -12,6 +12,10 @@ this snapshot, not the start of development. The original development history is
 preserved separately. See [release provenance](RELEASE_SNAPSHOT.md) and
 [contributors](CONTRIBUTORS.md).
 
+**Verification:** builds, backend/race tests and source-security checks passed.
+Six browser regression checks remain unresolved; see the
+[snapshot verification notes](RELEASE_SNAPSHOT.md#verification).
+
 Alpha Edge brings portfolio construction, security research, announcement-driven
 updates and day-to-day portfolio management into one investment application.
 
