@@ -1,0 +1,60 @@
+.header {
+    display: flex;
+    flex-shrink: 0;
+    min-height: 32px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    border-bottom: 1px solid color-mix(in srgb, var(--foreground) 12%, var(--panel-bg));
+    padding-bottom: 8px;
+}
+
+.title {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    color: var(--foreground);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 20px;
+    letter-spacing: 0;
+}
+
+.icon {
+    display: block;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    color: var(--foreground);
+}
+
+.titleButton {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 8px;
+    border-radius: 3px;
+    padding: 0;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    text-align: left;
+}
+
+.titleButton:hover {
+    color: var(--info);
+}
+
+.titleButton:focus-visible {
+    outline: 1px solid var(--info);
+    outline-offset: 3px;
+}
+
+.actions {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 6px;
+}

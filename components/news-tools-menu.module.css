@@ -1,0 +1,4 @@
+.menu { z-index: 180; min-width: 180px; padding: 4px; border: 1px solid var(--border); border-radius: 4px; background: var(--popover); color: var(--popover-foreground); box-shadow: 0 6px 20px #0003; font: 12px/1.45 system-ui; }
+.menu [role='menuitem'] { padding: 8px 10px; border-radius: 2px; cursor: pointer; outline: none; }
+.menu [data-highlighted] { background: var(--panel-bg-alt); }
+.menu [data-disabled] { opacity: 0.45; cursor: default; }

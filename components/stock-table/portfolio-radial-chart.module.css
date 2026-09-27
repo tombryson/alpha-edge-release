@@ -1,0 +1,51 @@
+.root {
+    --radial-held: var(--overview-text);
+    --radial-target: var(--info, #58a6ff);
+    --radial-surface: var(--analysis-stock-row-bg);
+    color: var(--overview-text);
+    background: var(--radial-surface);
+    font-family: var(--workspace-font);
+    font-size: 13px;
+    padding: 18px 20px 24px;
+    min-width: 0;
+}
+
+.legend { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 22px; color: var(--overview-text-secondary); }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.legend i { width: 24px; height: 0; }
+.heldKey { border-top: 3px solid var(--radial-held); }
+.targetKey { border-top: 2px dashed var(--radial-target); }
+.filter { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; min-height: 32px; cursor: pointer; }
+.filter input { width: 15px; height: 15px; margin: 0; accent-color: var(--radial-target); cursor: pointer; }
+.chartMeta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; padding-top: 6px; color: var(--overview-text-secondary); font-size: 12px; }
+.plot { width: 100%; min-height: 300px; }
+.plot svg { display: block; margin: 0 auto; touch-action: pan-y; }
+.grid, .axis { fill: none; stroke: var(--overview-border); stroke-width: 1; }
+.axis { stroke: var(--overview-border-soft); }
+.heldFill { fill-opacity: 0.24; }
+.heldLine { fill: none; stroke: var(--radial-held); stroke-width: 2.6; stroke-linejoin: round; stroke-linecap: round; }
+.targetLine { fill: none; stroke: var(--radial-target); stroke-width: 1.8; stroke-dasharray: 6 5; stroke-linejoin: round; stroke-linecap: round; }
+.targetFill { fill: var(--radial-target); fill-opacity: 0.06; }
+.heldDot { stroke: none; }
+.targetDot { stroke: var(--radial-target); stroke-width: 1.25; fill: none; }
+.activeAxis { stroke: var(--overview-text-muted); stroke-width: 1; opacity: 0.4; pointer-events: none; }
+.label { fill: var(--overview-text); font-size: 13px; font-weight: 400; }
+.tick { fill: var(--overview-text-secondary); font-size: 11px; paint-order: stroke; stroke: var(--radial-surface); stroke-width: 4; stroke-linejoin: round; }
+.inspector { border-top: 1px solid var(--overview-border); display: flex; align-items: flex-start; flex-wrap: wrap; gap: 16px 24px; padding: 16px 0 12px; }
+.classSelect { display: grid; gap: 7px; flex: 1 1 210px; min-width: 0; max-width: 340px; }
+.classSelect > span { font-size: 12px; color: var(--overview-text-secondary); }
+.classSelect select { width: 100%; min-width: 0; height: 36px; padding: 0 10px; color: var(--overview-text); background: var(--overview-surface-deep); border: 1px solid var(--overview-border); border-radius: 4px; font: inherit; }
+.readout { flex: 1 1 270px; min-width: 0; }
+.selectedName { display: flex; align-items: center; gap: 8px; min-height: 18px; font-weight: 500; }
+.selectedName i { flex: 0 0 8px; height: 8px; border-radius: 1px; }
+.values { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 8px; }
+.values span { display: flex; flex-direction: column; gap: 4px; color: var(--overview-text-secondary); font-size: 12px; }
+.values strong { font-size: 18px; font-weight: 500; color: var(--overview-text); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.unavailable { padding: 40px 0; color: var(--overview-text-secondary); }
+
+@media (max-width: 767px) {
+    .root { padding: 14px 10px 20px; }
+    .filter { min-height: 44px; }
+    .classSelect { max-width: none; }
+    .classSelect select { height: 44px; font-size: 16px; }
+}

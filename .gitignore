@@ -1,0 +1,61 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+
+# next.js
+/.next/
+/.next-*/
+/out/
+
+# production
+/build
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# databases & backups — never commit financial data (audit remediation 1.3)
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite3-wal
+*.sqlite3-shm
+*.pem
+*.key
+*.p12
+*.pfx
+*.dump
+*.bak
+backend/backup.sql
+tmp/db-sync/
+*.bundle
+
+# compiled binaries
+backend/main
+backend/trading-backend
+backend/trading-terminal-backend
+
+# local tooling & OS noise
+.claude/
+.DS_Store
+test-results/
+.git.pre-purge/
+tmp_inspect*.mjs
+favicon2.ico

@@ -1,0 +1,12 @@
+[
+  { "id": "overview", "label": "Overview", "file": "overview.md" },
+  { "id": "positions", "label": "Positions", "file": "positions.md" },
+  { "id": "analysis", "label": "Analysis", "file": "analysis.md" },
+  { "id": "portfolio", "label": "Portfolio", "file": "portfolio.md" },
+  { "id": "etfs", "label": "ETFs", "file": "etfs.md" },
+  { "id": "markets", "label": "Markets", "file": "markets.md" },
+  { "id": "alerts", "label": "Alerts", "file": "alerts.md" },
+  { "id": "system", "label": "System", "file": "system.md" },
+  { "id": "news", "label": "News", "file": "news.md" },
+  { "id": "history", "label": "History", "file": "history.md" }
+]

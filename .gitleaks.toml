@@ -1,0 +1,11 @@
+title = "Alpha Edge source secret scanning"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "SQL primary-key declaration in the isolated overlay schema test; not an API key"
+condition = "AND"
+paths = ['''(^|/)backend/portfolio_overlay_readonly_test\.go$''']
+regexTarget = "match"
+regexes = ['''^KEY AUTOINCREMENT,\s+from_q1_exposure_pct\s*$''']

@@ -1,0 +1,139 @@
+name: Application and documentation checks
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+jobs:
+  source-security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.x'
+          cache: false
+      - run: npm ci --ignore-scripts
+      - run: npm run check:publication
+      - run: npm run test:publication
+      - run: go install github.com/zricethezav/gitleaks/v8@v8.30.1
+      - name: Scan committed source without exposing matched credentials
+        run: |
+          mkdir "$RUNNER_TEMP/source-scan"
+          git archive HEAD | tar -x -C "$RUNNER_TEMP/source-scan"
+          "$(go env GOPATH)/bin/gitleaks" dir "$RUNNER_TEMP/source-scan" --config .gitleaks.toml --redact=100 --no-banner --max-decode-depth=2
+
+  backend:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go: ['1.26.x', 'stable']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go }}
+          cache-dependency-path: backend/go.sum
+      - run: sudo apt-get update && sudo apt-get install -y restic
+      - run: go test ./...
+        working-directory: backend
+      - run: go test -race ./internal/database ./cmd/dbtool -count=1
+        working-directory: backend
+      - run: go test -race -run '^TestOwner|^TestAuth|^TestCouncilCaller' -count=1
+        working-directory: backend
+      - run: go test -race -run '^TestWorkflowContract|^TestWeight|^TestStatement|^TestLegacyStatement|^TestBackup' -count=1
+        working-directory: backend
+      - run: go build ./cmd/dbtool
+        working-directory: backend
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm ls --all
+      - run: npm audit --audit-level=moderate
+      - run: npm run typecheck
+      - run: npm run test:council-proxy
+      - run: npm run test:access
+      - run: npm run test:asset-class-index
+      - run: npm run test:monitoring
+      - run: npm run test:freshness
+      - run: npm run test:polling
+      - run: npm run test:analysis-metrics
+      - run: npm run test:positions-model-weight
+      - run: npm run test:portfolio-comparison
+      - run: npm run build
+
+  documentation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.x'
+          cache: false
+      - run: npm ci
+      - run: npm run docs:audit
+      - run: npm run test:docs
+      - run: npm run test:contracts
+
+  owner-browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.x'
+          cache-dependency-path: backend/go.sum
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: NEXT_DIST_DIR=.next-access npm run build
+      - run: npm run test:access:browser
+
+  workflow-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:release:browser
+
+  release-gate:
+    if: always()
+    needs: [source-security, backend, frontend, documentation, owner-browser, workflow-browser]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every release check
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          node -e 'const jobs=Object.values(JSON.parse(process.env.RESULTS)); if(jobs.some(job=>job.result!=="success")) process.exit(1)'

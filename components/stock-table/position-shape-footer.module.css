@@ -1,0 +1,45 @@
+.footer {
+    container: positions-shape / inline-size;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 12px;
+    min-height: 48px;
+    padding-inline: 12px;
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.strip { scrollbar-width: none; }
+.strip::-webkit-scrollbar { display: none; }
+.controls { justify-self: end; }
+
+.slice:focus-visible {
+    outline: 1px solid var(--muted-foreground);
+    outline-offset: -1px;
+}
+
+/* Use the space left by the sidebars, not the browser width. */
+@container positions-shape (max-width: 768px) {
+    .strip {
+        grid-column: 1 / -1;
+        min-height: 44px;
+        scrollbar-width: thin;
+        scrollbar-color: var(--border) transparent;
+    }
+
+    .strip::-webkit-scrollbar { display: block; height: 4px; }
+    .strip::-webkit-scrollbar-thumb { background: var(--border); }
+    .slice { flex: 0 0 200px; }
+    .label { font-size: 11px; line-height: 16px; letter-spacing: 0; }
+    .target, .current { font-size: 11px; line-height: 16px; }
+
+    .controls {
+        grid-column: 1 / -1;
+        min-height: 40px;
+        padding-bottom: 6px;
+    }
+
+    .controls > button, .units { height: 32px; }
+    .controls button { min-width: 32px; font-size: 11px; letter-spacing: 0; }
+    .units button { height: 100%; }
+}

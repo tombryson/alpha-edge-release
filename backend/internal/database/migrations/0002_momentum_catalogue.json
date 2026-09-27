@@ -1,0 +1,107 @@
+[
+  {
+    "ticker": "FANG",
+    "exchange": "ASX:",
+    "tradingview": "ASX_DLY:FANG",
+    "provider": "FANG.AX",
+    "currency": "AUD"
+  },
+  {
+    "ticker": "GPEQ",
+    "exchange": "ASX:",
+    "tradingview": "ASX_DLY:GPEQ",
+    "provider": "GPEQ.AX",
+    "currency": "AUD"
+  },
+  {
+    "ticker": "ESPO",
+    "exchange": "ASX:",
+    "tradingview": "ASX_DLY:ESPO",
+    "provider": "ESPO.AX",
+    "currency": "AUD"
+  },
+  {
+    "ticker": "ASIA",
+    "exchange": "ASX:",
+    "tradingview": "ASX_DLY:ASIA",
+    "provider": "ASIA.AX",
+    "currency": "AUD"
+  },
+  {
+    "ticker": "SGDJ",
+    "exchange": "BATS:",
+    "tradingview": "BATS:SGDJ",
+    "provider": "SGDJ",
+    "currency": "USD"
+  },
+  {
+    "ticker": "SLVR",
+    "exchange": "BATS:",
+    "tradingview": "BATS:SLVR",
+    "provider": "SLVR",
+    "currency": "USD"
+  },
+  {
+    "ticker": "ARMR",
+    "exchange": "ASX:",
+    "tradingview": "ASX_DLY:ARMR",
+    "provider": "ARMR.AX",
+    "currency": "AUD"
+  },
+  {
+    "ticker": "SEMI",
+    "exchange": "ASX:",
+    "tradingview": "ASX_DLY:SEMI",
+    "provider": "SEMI.AX",
+    "currency": "AUD"
+  },
+  {
+    "ticker": "LSX",
+    "exchange": "ASX:",
+    "tradingview": "ASX_DLY:LSX",
+    "provider": "LSX.AX",
+    "currency": "AUD"
+  },
+  {
+    "ticker": "NUCL",
+    "exchange": "LSE:",
+    "tradingview": "LSE_DLY:NUCL",
+    "provider": "NUCL.L",
+    "currency": "GBP"
+  },
+  {
+    "ticker": "VPN",
+    "exchange": "LSE:",
+    "tradingview": "LSE_DLY:VPN",
+    "provider": "VPN.L",
+    "currency": "GBP"
+  },
+  {
+    "ticker": "LITP",
+    "exchange": "BATS:",
+    "tradingview": "BATS:LITP",
+    "provider": "LITP",
+    "currency": "USD"
+  },
+  {
+    "ticker": "LSF",
+    "exchange": "ASX:",
+    "tradingview": "ASX_DLY:LSF",
+    "provider": "LSF.AX",
+    "currency": "AUD"
+  },
+  {
+    "ticker": "UFO",
+    "exchange": "BATS:",
+    "tradingview": "BATS:UFO",
+    "provider": "UFO",
+    "currency": "USD"
+  },
+  {
+    "ticker": "COPJ",
+    "exchange": "BATS:",
+    "tradingview": "BATS:COPJ",
+    "provider": "COPJ",
+    "currency": "USD"
+  }
+]

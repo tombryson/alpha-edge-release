@@ -1,0 +1,99 @@
+/* Opt-in workspace styles. Positions, Analysis and the shell remain references. */
+.terminal-workspace-controls {
+    --control-height: 30px;
+    --control-touch-height: 36px;
+    --control-radius: 3px;
+    --control-font-size: 12px;
+    --control-hover: color-mix(in srgb, var(--foreground) 6%, var(--background));
+    --control-selected: color-mix(in srgb, var(--foreground) 12%, var(--background));
+    --control-indicator: inset 0 -2px 0 currentColor;
+    --control-focus: var(--info);
+}
+
+.terminal-workspace {
+    --workspace-font: system-ui, -apple-system, sans-serif;
+    --workspace-surface: var(--background);
+    --workspace-group: var(--panel-bg-alt);
+    --workspace-header: color-mix(in oklab, var(--card) 94%, var(--background));
+    --workspace-border: color-mix(in srgb, var(--border) 78%, var(--foreground));
+    --workspace-rule: color-mix(in srgb, var(--border) 90%, var(--foreground));
+    --workspace-text: var(--foreground);
+    --workspace-secondary: color-mix(in srgb, var(--foreground) 78%, var(--background));
+    --workspace-muted: color-mix(in srgb, var(--foreground) 65%, var(--background));
+    --workspace-hover: var(--analysis-stock-row-hover-bg);
+    font-family: var(--workspace-font);
+    font-size: 13px;
+    line-height: 1.5;
+    letter-spacing: 0;
+    color: var(--workspace-text);
+}
+
+.terminal-workspace-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 12px;
+    min-height: 42px;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--workspace-border);
+    background: var(--workspace-header);
+}
+
+.terminal-workspace-title {
+    margin: 0;
+    font-family: var(--workspace-font);
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--workspace-text);
+}
+
+.terminal-workspace-meta {
+    font-size: 11px;
+    line-height: 1.5;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--workspace-muted);
+}
+
+.terminal-workspace-group-title {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--workspace-text);
+}
+
+.terminal-workspace-column {
+    font-family: var(--workspace-font);
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--workspace-secondary);
+    background: var(--workspace-header);
+}
+
+.terminal-workspace-row {
+    border-bottom: 1px solid var(--workspace-rule);
+    background: var(--analysis-stock-row-bg);
+}
+
+.terminal-workspace-row:hover {
+    background: var(--workspace-hover);
+}
+
+.terminal-workspace :where(button, input, select, a):focus-visible {
+    outline: 2px solid var(--info, var(--foreground));
+    outline-offset: 2px;
+}
+
+.terminal-workspace-controls :where(button, input, select, summary, a):focus-visible {
+    outline: 2px solid var(--control-focus);
+    outline-offset: -2px;
+}

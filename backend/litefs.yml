@@ -1,0 +1,34 @@
+# LiteFS configuration for replicated SQLite across Fly.io machines
+
+# Mount directory where the database will be accessible
+fuse:
+  dir: "/litefs"
+
+# Directory for internal LiteFS data (metadata on persistent volume)
+data:
+  dir: "/data"
+
+# Lease configuration - static leasing (simpler for single-region)
+lease:
+  type: "static"
+  advertise-url: "http://${HOSTNAME}.vm.${FLY_APP_NAME}.internal:20202"
+  candidate: ${FLY_REGION == PRIMARY_REGION}
+  promote: true
+  hostname: "${HOSTNAME}"
+
+# Proxy configuration - HTTP requests route to primary when needed
+proxy:
+  addr: ":8080"
+  target: "localhost:8081"
+  db: "/litefs/trading.db"
+  passthrough:
+    - "*.ico"
+    - "*.png"
+
+# Where to run the actual application
+exec:
+  - cmd: "/app/main"
+    if-candidate: true
+
+  - cmd: "/app/main"
+    if-candidate: false

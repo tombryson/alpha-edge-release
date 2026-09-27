@@ -1,0 +1,152 @@
+.news-workspace {
+  container: news / inline-size;
+  --news-teal: light-dark(#0f766e, #5eead4);
+  --news-violet: light-dark(#6d28d9, #c4b5fd);
+}
+
+.news-workspace .news-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 23%);
+  flex: 1;
+  min-height: 0;
+  gap: 12px;
+  overflow: hidden;
+}
+
+.news-workspace .news-section {
+  border-block: 1px solid var(--workspace-border);
+  background: var(--workspace-surface);
+}
+
+.news-workspace .news-section-header {
+  padding: 8px 12px;
+  background: var(--workspace-group);
+  border-bottom: 1px solid var(--workspace-border);
+}
+
+.news-workspace .news-ledger {
+  border-left: 1px solid var(--workspace-border);
+}
+
+.news-workspace .news-row {
+  padding: 8px 12px;
+  background: var(--analysis-stock-row-bg);
+  border-bottom-color: var(--workspace-rule);
+}
+
+.news-workspace .news-row:hover,
+.news-workspace .news-selected {
+  background: var(--workspace-hover);
+}
+
+.news-workspace .news-selected {
+  box-shadow: inset 2px 0 var(--info);
+}
+
+.news-workspace .news-commands button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 4px 10px;
+  min-height: var(--control-height);
+  border-radius: var(--control-radius);
+  font-size: var(--control-font-size);
+}
+
+.news-workspace .news-commands button:hover:not(:disabled) { background: var(--control-hover); }
+.news-workspace .news-commands .news-more { width: var(--control-height); padding: 0; }
+.news-workspace .news-more[data-state='open'] { background: var(--control-selected); }
+.news-workspace .news-brief { padding: 10px 12px; }
+.news-workspace .news-subject { margin-bottom: 5px; }
+.news-workspace .news-item-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.news-workspace .news-provenance { margin-top: 3px; color: var(--muted-foreground); font-size: 11px; }
+.news-workspace .news-provenance summary { cursor: pointer; width: fit-content; }
+.news-workspace .news-provenance[open] summary { margin-bottom: 4px; }
+.news-workspace .news-job { padding: 7px 12px; }
+.news-workspace .news-job-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; font-size: 12px; }
+.news-workspace .news-job-heading > span:first-child { flex-shrink: 0; font-weight: 500; }
+.news-workspace .news-job-error { margin-top: 3px; font-size: 11px; color: var(--destructive); }
+.news-workspace .news-job-error summary { cursor: pointer; width: fit-content; }
+.news-workspace .news-job-error p { margin: 6px 0 0; font-size: 12px; overflow-wrap: anywhere; }
+
+.news-workspace .news-filters button {
+  min-height: var(--control-height);
+  border: 1px solid transparent;
+  border-radius: var(--control-radius);
+  padding-inline: 8px;
+  color: var(--muted-foreground);
+  background: transparent;
+  font-size: var(--control-font-size);
+  cursor: pointer;
+}
+.news-workspace .news-filters button:hover { background: var(--control-hover); color: var(--foreground); }
+.news-workspace .news-filters button[aria-pressed='true'] { color: var(--foreground); box-shadow: var(--control-indicator); }
+.news-workspace .news-filters .news-filter-bull[aria-pressed='true'] { color: var(--success); }
+.news-workspace .news-filters .news-filter-bear[aria-pressed='true'] { color: var(--destructive); }
+
+@media (pointer: coarse) {
+  .news-workspace .news-commands button,
+  .news-workspace .news-filters button { min-height: var(--control-touch-height); }
+  .news-workspace .news-commands .news-more { width: var(--control-touch-height); }
+}
+
+.news-workspace .news-count {
+  border-radius: 3px;
+}
+
+.news-workspace .news-context {
+  max-height: 28%;
+}
+
+.news-workspace .news-context-column {
+  border-left: 1px solid var(--workspace-rule);
+}
+
+/* Use the available workspace width, including when terminal sidebars are open. */
+@container news (max-width: 1100px) {
+  .news-workspace .news-layout {
+    display: block;
+    overflow: auto;
+  }
+
+  .news-workspace .news-primary,
+  .news-workspace .news-ledger,
+  .news-workspace .news-body {
+    overflow: visible;
+  }
+
+  .news-workspace .news-items,
+  .news-workspace .news-changes,
+  .news-workspace .news-context {
+    max-height: none;
+    overflow: visible;
+    flex: none;
+  }
+
+  .news-workspace .news-ledger {
+    margin-top: 12px;
+    border-left: 0;
+  }
+
+  .news-workspace .news-ledger > div {
+    height: auto;
+  }
+}
+
+/* Short desktop windows must not squeeze narrative evidence into a sliver. */
+@media (max-height: 850px) {
+  .news-workspace .news-primary {
+    overflow: auto;
+  }
+
+  .news-workspace .news-primary .news-section {
+    flex: none;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .news-workspace .news-primary .news-body {
+    overflow: visible;
+  }
+}

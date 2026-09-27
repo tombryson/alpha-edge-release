@@ -1,0 +1,182 @@
+/* Desktop geometry stays in its existing owners. Phone overrides are opt-in
+   through this breakpoint, never a scale transform on the whole terminal. */
+.terminal-mobile-navigation { display: none; }
+
+.terminal-mobile-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgb(0 0 0 / 45%);
+}
+.terminal-mobile-drawer {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 301;
+  display: flex;
+  flex-direction: column;
+  width: min(390px, 100%);
+  height: 100dvh;
+  max-width: 100vw;
+  background: var(--background);
+  color: var(--foreground);
+  border-right: 1px solid var(--border);
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.terminal-mobile-drawer[data-side='right'] { inset: 0 0 0 auto; border-left: 1px solid var(--border); border-right: 0; }
+.terminal-mobile-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 0 0 auto;
+  min-height: 52px;
+  padding: 4px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel-bg-alt);
+  font-size: 15px;
+  font-weight: 500;
+}
+.terminal-mobile-drawer-body { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+.terminal-mobile-drawer-body > :first-child { width: 100%; min-width: 0; }
+.terminal-mobile-icon { display: inline-grid; width: 44px; height: 44px; flex: 0 0 44px; place-items: center; color: var(--foreground); border-radius: 4px; }
+.terminal-mobile-icon:hover { background: var(--muted); }
+.terminal-mobile-menu { display: grid; padding: 8px; gap: 2px; }
+.terminal-mobile-menu button { min-height: 44px; padding: 10px 12px; text-align: left; font-size: 14px; border-left: 2px solid transparent; }
+.terminal-mobile-menu button[aria-current='page'] { background: var(--panel-bg-alt); border-left-color: var(--info); }
+.terminal-mobile-utilities { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; border-top: 1px solid var(--border); padding: 12px 16px; }
+.terminal-mobile-utilities button { min-width: 40px; min-height: 40px; font-size: 12px; }
+.terminal-mobile-import { padding: 8px 16px 16px; font-size: 12px; color: var(--muted-foreground); }
+.terminal-mobile-drawer :where(button, input, select, a):focus-visible { outline: 2px solid var(--info); outline-offset: 2px; }
+
+@media (max-width: 1023px) {
+  .terminal-shell {
+    height: 100dvh;
+    padding-inline: env(safe-area-inset-left) env(safe-area-inset-right);
+  }
+  .terminal-shell .terminal-desktop-rail { display: none; }
+  .terminal-shell .terminal-center-panel { min-height: 0; width: 100%; transition: none; }
+  .terminal-shell .terminal-unified-header {
+    grid-template-areas: 'brand mobile' 'stats stats';
+    grid-template-columns: max-content minmax(0, 1fr);
+    min-height: 104px;
+    padding: env(safe-area-inset-top) 8px 4px;
+  }
+  .terminal-shell .terminal-shell-nav,
+  .terminal-shell .terminal-header-utilities { display: none; }
+  .terminal-shell .terminal-brand { min-width: 42px; height: 38px; padding-inline: 4px; }
+  .terminal-shell .terminal-brand-wordmark { display: none; }
+  .terminal-mobile-navigation { grid-area: mobile; display: flex; align-items: center; justify-content: flex-end; min-width: 0; }
+  .terminal-mobile-menu-trigger { display: flex; flex: 1; align-items: center; gap: 8px; min-height: 44px; padding: 4px 12px; min-width: 0; color: var(--foreground); font-size: 14px; }
+  .terminal-shell .terminal-portfolio-stats { display: grid; grid-template-columns: 0.85fr 1fr 1.25fr; height: auto; justify-self: stretch; padding-block: 6px; white-space: normal; }
+  .terminal-shell .terminal-header-stat { padding-inline: 6px; justify-content: flex-start; }
+  .terminal-shell .terminal-header-stat-label { font-size: 10px; line-height: 1.4; letter-spacing: 0; }
+  .terminal-shell .terminal-header-stat-value { font-size: 12px; line-height: 1.45; overflow-wrap: anywhere; }
+  .terminal-action-dialog { max-width: calc(100vw - 24px); max-height: calc(100dvh - 24px); overflow-y: auto; }
+  .terminal-action-dialog button { min-height: 40px; }
+}
+
+@media (max-width: 767px) {
+  .terminal-shell .terminal-tabbar.terminal-contextbar { height: auto; min-height: 48px; flex-wrap: wrap; padding: 4px 8px; }
+  .terminal-shell .terminal-tab-actions { flex-wrap: wrap; min-width: 0; }
+  .terminal-shell .terminal-contextbar .terminal-tab-actions button { min-height: 36px; }
+  .terminal-shell .analysis-context-toolbar { height: auto; min-height: 48px; flex-wrap: wrap; gap: 6px; padding: 6px 8px; }
+  .terminal-shell .analysis-toolbar-search { flex: 1 1 100%; max-width: none; }
+  .terminal-shell .analysis-context-toolbar button { min-height: 36px; }
+  .terminal-shell .analysis-context-toolbar > div:last-child { width: 100%; flex-wrap: wrap; margin-left: 0; }
+  .terminal-shell .analysis-context-toolbar [aria-label='Analysis layout'] { height: 36px; }
+  .terminal-shell .analysis-toolbar-search input { height: 40px; }
+  .terminal-shell .terminal-page-content { min-width: 0; padding-bottom: env(safe-area-inset-bottom); }
+  .terminal-shell .position-grid-scroll { overflow: auto; min-width: 0; scrollbar-width: thin; }
+  .terminal-shell .positions-grid { min-width: 820px; }
+  .terminal-shell .positions-grid th:first-child { position: sticky; left: 0; z-index: 35; background: color-mix(in oklab, var(--card) 94%, var(--background)); }
+  /* Row tints sit over an opaque backing so scrolled cells cannot show through. */
+  .terminal-shell .positions-grid td:first-child {
+    position: sticky; left: 0; z-index: 15;
+    background-image: linear-gradient(var(--position-pinned-tint, var(--panel-bg-alt)), var(--position-pinned-tint, var(--panel-bg-alt))), linear-gradient(var(--card), var(--card));
+  }
+  .terminal-shell .positions-grid tr.positions-stock-row { --position-pinned-tint: transparent; }
+  .terminal-shell .positions-grid tr.positions-stock-row.is-core-etf,
+  .terminal-shell .positions-grid:not(.positions-actions-grid) tr.positions-stock-row.is-outperforming { --position-pinned-tint: color-mix(in srgb, var(--position-highlight-accent) 4%, transparent); }
+  .terminal-shell .positions-grid:not(.positions-actions-grid) tr.positions-stock-row:hover { --position-pinned-tint: color-mix(in oklab, var(--primary) 8%, transparent); }
+  .terminal-shell .positions-grid tr.is-position-selected,
+  .terminal-shell .positions-grid:not(.positions-actions-grid) tr.positions-stock-row.is-position-selected { --position-pinned-tint: color-mix(in oklab, var(--color-sky-500) 5.5%, transparent); }
+  .terminal-shell .positions-grid td[colspan] { position: static; }
+  .terminal-shell .analysis-grid th:first-child,
+  .terminal-shell .analysis-grid td:first-child { position: sticky; left: 0; z-index: 15; background: var(--panel-bg-alt); }
+  .terminal-shell .analysis-grid td[colspan] { position: static; }
+  .terminal-shell .analysis-grid th:first-child { z-index: 35; }
+  .terminal-shell [data-news-root] { padding: 6px; }
+  .terminal-shell [data-news-root] .news-shell > .terminal-workspace-header { flex-shrink: 0; }
+  .terminal-shell [data-news-root] .news-commands button { min-height: 40px; }
+  .terminal-shell [data-news-root] aside button { min-height: 36px; min-width: 36px; }
+  .terminal-shell .positions-grid td:first-child { padding-inline: 8px; }
+  .terminal-shell .analysis-grid .analysis-name-cell { padding-left: 10px; }
+  .terminal-shell .analysis-grid { --analysis-security-indent: 0px; }
+  .terminal-shell .analysis-grid .analysis-name-primary { flex-wrap: wrap; gap: 4px; }
+  .terminal-shell .analysis-grid .analysis-name-content { flex-wrap: wrap; gap: 4px; }
+  .terminal-shell .analysis-grid .analysis-company-name { flex-basis: 100%; white-space: normal; overflow-wrap: anywhere; font-size: 12px; line-height: 1.4; letter-spacing: 0; }
+  .terminal-shell .analysis-grid .analysis-security-type-toggle,
+  .terminal-shell .analysis-grid .analysis-row-expander { min-width: 28px; min-height: 28px; }
+  .terminal-shell .analysis-grid .analysis-row-expander-placeholder { display: none; }
+  .terminal-shell .analysis-grid .analysis-name-ticker-hover-zone { display: none; }
+  .terminal-shell .analysis-grid .analysis-ticker-rail { margin-left: 0; }
+  .terminal-shell .analysis-grid .analysis-stock-row td { padding-top: 5px; padding-bottom: 5px; }
+  .terminal-shell .analysis-grid .analysis-hierarchy-label { font-size: 18px; white-space: normal; }
+  .terminal-shell .analysis-grid .analysis-security-type-toggle { opacity: 1; }
+  .terminal-shell .analysis-grid .analysis-company-identity.has-exchange-warning { padding-right: 18px; }
+  .terminal-shell .analysis-grid .analysis-exchange-warning { width: 28px; height: 28px; top: -7px; right: -4px; align-items: start; padding-top: 4px; }
+  .terminal-shell .analysis-grid .analysis-inline-editor { min-width: 0; max-width: calc(100vw - 24px); flex-wrap: wrap; }
+  .terminal-shell [data-terminal-page='MARKETS'] header { flex-wrap: wrap; gap: 10px; padding: 12px; }
+  .terminal-shell [data-terminal-page='MARKETS'] header > div:last-child { flex-shrink: 0; }
+  .terminal-shell .market-map-list { min-width: 0; }
+  .terminal-shell .market-map-header { display: none; }
+  .terminal-shell .market-map-row { min-width: 0; display: flex; flex-direction: column; margin-bottom: 8px; }
+  .terminal-shell .market-map-open { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 10px; padding-bottom: 10px; }
+  .terminal-shell .market-map-open > span:first-child { grid-column: 1 / -1; height: auto; padding: 12px 50px 0 8px; }
+  .terminal-shell .market-map-open [data-market-identity-content] { margin-left: 0; }
+  .terminal-shell [data-mobile-label] { flex-wrap: wrap; justify-content: flex-start; border-left: 0; padding-inline: 8px; row-gap: 4px; }
+  .terminal-shell [data-mobile-label]::before { content: attr(data-mobile-label); flex-basis: 100%; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted-foreground); }
+  .terminal-shell .market-map-next-step { width: 44px; height: 44px; }
+  .terminal-shell .market-map-actions { min-height: 44px; border-top: 1px solid var(--border); }
+  .terminal-shell [data-market-evidence-control] { width: 44px; height: 44px; }
+  .terminal-shell [data-market-edit-hover-zone] { left: auto; right: 0; top: 4px; width: 44px; height: 44px; min-width: 0; }
+  .terminal-shell [data-market-edit-hover-zone] button { position: static; width: 44px; height: 44px; opacity: 1; pointer-events: auto; transform: none; justify-content: center; padding: 0; }
+  .terminal-shell [data-market-edit-hover-zone] button span { display: none; }
+  .terminal-shell [data-market-edit-hover-zone] button svg { width: 18px; height: 18px; }
+  .terminal-shell [id^='market-stock-evidence-'] { min-width: 0; display: block; }
+  .terminal-shell [data-testid^='market-stock-evidence-row-'] { display: flex; flex-wrap: wrap; height: auto; gap: 6px 14px; padding: 6px 8px; }
+  .terminal-shell [data-testid^='market-stock-evidence-row-'] > span { border-left: 0; padding-inline: 0; }
+  .terminal-shell [data-testid^='market-stock-evidence-row-'] > span:first-child { flex-basis: 100%; }
+  .terminal-shell [data-testid^='market-stock-evidence-row-'] > span:empty { display: none; }
+  .terminal-shell [data-testid='market-configuration-dialog'] { max-height: calc(100dvh - 40px); }
+  .terminal-shell [data-testid='market-configuration-dialog'] > div { padding: 12px; }
+  .terminal-shell [data-testid='market-configuration-dialog'] button { min-height: 40px; }
+  .terminal-shell [data-testid='help-tab'] > header { padding: 12px; }
+  .terminal-shell [data-testid='help-tab'] > div { flex-direction: column; }
+  .terminal-shell [data-testid='help-tab'] aside { width: 100%; padding: 6px 8px; border-right: 0; border-bottom: 1px solid var(--border); }
+  .terminal-shell [data-testid='help-tab'] aside > div { display: none; }
+  .terminal-shell [aria-label='Help contents'] { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: thin; }
+  .terminal-shell [aria-label='Help contents'] button { width: auto; flex: 0 0 auto; min-height: 40px; font-size: 12px; }
+  .terminal-shell [aria-label='Help contents'] svg { display: none; }
+  .terminal-shell [data-testid='help-scroll-area'] > div { padding: 12px; }
+  .terminal-shell [data-terminal-page='HISTORY'] > div { padding: 8px; }
+  .terminal-shell [data-terminal-page='HISTORY'] .terminal-workspace-header { gap: 8px; padding: 8px; }
+  .terminal-shell [data-terminal-page='HISTORY'] table { min-width: 680px; }
+  .terminal-shell [data-terminal-page='HISTORY'] input { max-width: 100%; min-width: 0; }
+  .terminal-shell [data-terminal-page='POSITIONS'] > .grid,
+  .terminal-shell [data-terminal-page='PORTFOLIO'] > .grid { display: flex; flex-direction: column; height: auto; }
+  .terminal-shell [data-terminal-page='POSITIONS'] > .grid > div:first-child,
+  .terminal-shell [data-terminal-page='PORTFOLIO'] > .grid > div:first-child { max-height: 50dvh; min-height: 240px; }
+  .terminal-shell .review-dock { position: static; grid-template-columns: minmax(0, 1fr); padding: 12px; }
+  .terminal-shell .review-dock-actions { flex-wrap: wrap; }
+  .terminal-shell .review-dock-button { min-height: 44px; }
+  [role='dialog']:not(.terminal-mobile-drawer) { max-width: calc(100vw - 16px); max-height: calc(100dvh - 16px); overflow-y: auto; }
+  .terminal-mobile-drawer :where(input, select, textarea),
+  .terminal-shell :where(input:not([type='checkbox']):not([type='radio']):not([type='range']), select, textarea) { font-size: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .terminal-shell .terminal-desktop-rail,
+  .terminal-shell .terminal-desktop-rail > div,
+  .terminal-shell .terminal-center-panel { transition: none; }
+}

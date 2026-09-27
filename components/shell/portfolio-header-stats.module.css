@@ -1,0 +1,12 @@
+.cashTrigger { padding: 0; border: 0; border-radius: 3px; background: transparent; text-align: left; cursor: pointer; }
+.profitValue[data-tone='gain'] { color: var(--success); }
+.profitValue[data-tone='loss'] { color: var(--destructive); }
+.profitValue[data-tone='neutral'] { color: var(--foreground); }
+.cashTrigger:focus-visible { outline: 2px solid var(--info); outline-offset: 3px; }
+.breakdown { z-index: 310; width: 244px; max-width: calc(100vw - 24px); padding: 12px; border: 1px solid var(--panel-border); border-radius: 6px; background: var(--popover); color: var(--popover-foreground); box-shadow: 0 6px 20px #0003; font-size: 12px; line-height: 18px; }
+.breakdown dl { margin: 0; }
+.breakdown dl > div { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 4px 0; }
+.breakdown dt { color: var(--muted-foreground); }
+.breakdown dd { margin: 0; font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.breakdown .shortfall { margin-top: 5px; padding-top: 8px; border-top: 1px solid var(--panel-border); }
+.shortfall dt, .shortfall dd { color: var(--destructive); }

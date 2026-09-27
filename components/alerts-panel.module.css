@@ -1,0 +1,202 @@
+.panel {
+    --alert-rule: color-mix(in srgb, var(--foreground) 16%, var(--panel-bg));
+    --alert-secondary: color-mix(in srgb, var(--foreground) 65%, var(--muted-foreground));
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    padding: 10px;
+    overflow: hidden;
+    font-family: var(--font-sans), sans-serif;
+    font-size: 13px;
+    line-height: 20px;
+    letter-spacing: 0;
+    container: alert-stack / inline-size;
+}
+
+.panelHeader { margin-bottom: 12px; padding: 0 2px 10px; }
+.scrollArea { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; }
+.scrollArea > * + * { margin-top: 16px; }
+.riskThrottle { --alert-risk-accent: var(--caution); }
+.riskCrisis { --alert-risk-accent: var(--destructive); }
+.riskHeading { margin: 0 0 8px; padding-left: 2px; color: var(--alert-secondary); font-size: 11px; font-weight: 500; line-height: 18px; }
+.riskCard {
+    border: 1px solid color-mix(in srgb, var(--alert-risk-accent) 42%, var(--alert-rule));
+    border-radius: 4px;
+    background: color-mix(in srgb, color-mix(in srgb, var(--panel-bg-alt) 60%, var(--panel-bg)) 70%, transparent);
+    padding: 10px;
+}
+.riskCardHeader { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.riskTitle { display: flex; align-items: center; gap: 6px; color: var(--foreground); font-size: 13px; font-weight: 500; line-height: 20px; }
+.riskTitle svg { flex: none; color: var(--alert-risk-accent); }
+.riskStatus { flex: none; border: 1px solid color-mix(in srgb, var(--alert-risk-accent) 40%, transparent); border-radius: 3px; padding: 1px 5px; color: var(--alert-risk-accent); font-size: 11px; font-weight: 500; line-height: 18px; }
+.riskDetail { margin-top: 8px; color: var(--alert-secondary); font-size: 11px; line-height: 18px; }
+.riskTarget { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; color: var(--alert-secondary); font-size: 12px; line-height: 20px; }
+.riskValue { flex: none; color: var(--foreground); font-size: 14px; font-weight: 500; font-variant-numeric: tabular-nums; }
+
+.sectionHeader { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; padding: 0 2px; min-height: 36px; }
+.sectionTitle { display: flex; align-items: center; gap: 8px; margin: 0; color: var(--foreground); font-size: 12px; font-weight: 500; line-height: 20px; }
+.sectionCount, .groupCount { display: inline-flex; flex: none; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 4px; font-size: 11px; font-weight: 400; line-height: 18px; font-variant-numeric: tabular-nums; color: var(--alert-secondary); }
+.sectionCount { border-radius: 4px; background: color-mix(in srgb, var(--foreground) 8%, var(--panel-bg)); }
+.scopeTabs { display: flex; flex: 1; align-items: stretch; min-width: 0; border-bottom: 1px solid var(--alert-rule); background: var(--panel-bg-alt); }
+.scopeTabs button { display: flex; flex: 1; align-items: center; justify-content: center; gap: 5px; min-width: 0; min-height: 36px; padding: 6px 4px; border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: transparent; color: var(--alert-secondary); font: inherit; font-size: 12px; font-weight: 500; line-height: 20px; white-space: nowrap; cursor: pointer; }
+.scopeTabs button:hover { color: var(--foreground); background: color-mix(in srgb, var(--foreground) 4%, transparent); }
+.scopeTabs button[aria-pressed='true'] { color: var(--foreground); border-bottom-color: var(--foreground); background: color-mix(in srgb, var(--foreground) 6%, transparent); }
+.scopeTabs .sectionCount { min-width: 2ch; height: auto; padding: 0; border-radius: 0; background: transparent; }
+.groupCount { min-width: 0; padding: 0; }
+.expandButton { display: grid; flex: none; width: 24px; height: 24px; padding: 0; place-items: center; border: 1px solid var(--alert-rule); border-radius: 4px; background: transparent; color: var(--foreground); cursor: pointer; }
+.expandButton:hover { background: var(--panel-bg-alt); border-color: var(--alert-secondary); }
+
+.groupList { display: flex; flex-direction: column; gap: 4.8px; }
+.group {
+    border-top: 1px solid color-mix(in srgb, var(--alert-class-color) 28%, transparent);
+    border-left: 2px solid var(--alert-class-color);
+    border-radius: 2px 2px / 3px 3px;
+    background: color-mix(in srgb, var(--alert-class-color) 5%, transparent);
+    padding: 3.2px 3.2px 0;
+}
+.groupHeader {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6.4px;
+    width: 100%;
+    min-height: 22.2px;
+    border: 0;
+    background: transparent;
+    padding: 1.6px 3.2px;
+    text-align: left;
+    cursor: pointer;
+}
+.groupHeader:hover { background: color-mix(in srgb, var(--card) 20%, transparent); }
+.groupIdentity { min-width: 0; display: flex; align-items: center; gap: 4.8px; }
+.groupMarker { flex: none; width: 1.6px; height: 8px; border-radius: 1px; background: var(--alert-class-color); }
+/* Readability pass: the text you scan sits at the 11px floor; card geometry is unchanged. */
+.groupTitle { overflow: hidden; padding: 2px; color: var(--foreground); font-size: 11px; font-weight: 500; line-height: 15px; text-overflow: ellipsis; white-space: nowrap; }
+.groupCount { height: auto; color: var(--muted-foreground); font-size: 11px; line-height: 15px; }
+.groupMeta { flex: none; display: flex; align-items: center; gap: 4.8px; color: var(--muted-foreground); font-size: 11px; line-height: 15px; }
+.groupMeta svg { width: 12px; height: 12px; }
+.groupChevron { transform: rotate(-90deg); }
+.groupHeader[aria-expanded='true'] .groupChevron { transform: rotate(0); }
+.groupContents { display: grid; grid-template-rows: 0fr; visibility: hidden; }
+.groupContents[data-expanded='true'] { grid-template-rows: 1fr; visibility: visible; }
+.positionAlertList { min-height: 0; overflow: hidden; }
+.groupContents[data-expanded='true'] .positionAlertList { padding-top: 3.2px; }
+.positionAlert + .positionAlert { margin-top: 3.2px; }
+
+/* Fixed card geometry, independent of the shell's density scale. */
+.positionAlert {
+    position: relative;
+    width: 100%;
+    min-height: 50px;
+    border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+    border-radius: 3px;
+    background: color-mix(in srgb, var(--card) 70%, transparent);
+    padding: 4.8px 25.6px 4.8px 4.8px;
+    cursor: pointer;
+}
+.positionAlert:hover, .positionAlert:focus-within { background: var(--card); }
+.alertContent { min-width: 0; display: flex; flex-direction: column; gap: 1.6px; }
+.alertHeading { display: flex; align-items: center; justify-content: space-between; gap: 6.4px; }
+.alertName { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--foreground); font-size: 12px; font-weight: 400; line-height: 15px; }
+.alertAge { flex: none; color: var(--muted-foreground); font-size: 11px; line-height: 20px; font-variant-numeric: tabular-nums; }
+.alertAgeCompact { display: none; }
+.alertDetails { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 3px 6.4px; font-size: 11px; line-height: 15px; }
+.alertSignals { min-width: 0; display: flex; align-items: center; flex-wrap: wrap; gap: 3px 4.8px; }
+.alertTicker { color: var(--muted-foreground); font-family: var(--font-mono), monospace; font-weight: 400; overflow-wrap: anywhere; }
+.signal { border: 1px solid color-mix(in srgb, currentColor 28%, transparent); border-radius: 2px; padding: 0 4px; line-height: 18px; font-weight: 500; }
+.positionAlert .signal { border: 0; padding: 0; font-size: 11px; line-height: 15px; font-weight: 500; }
+.alertMetrics { display: flex; flex: none; align-items: center; justify-content: flex-end; gap: 6.4px; margin-left: auto; font-variant-numeric: tabular-nums; }
+.alertMove { white-space: nowrap; }
+.positive { color: var(--success); }
+.negative { color: var(--destructive); }
+.caution { color: var(--caution); }
+.neutral { color: var(--alert-secondary); }
+/* Same arrow as the ETF allocations title link; muted so it never reads as price direction. */
+.alertChart { display: grid; place-items: center; flex: none; width: 14px; height: 12.8px; border-radius: 3px; color: var(--muted-foreground); }
+.alertChart svg { width: 13px; height: 13px; transition: color 120ms ease, transform 120ms ease; }
+.alertChart:hover, .alertChart:focus-visible { color: var(--foreground); background: color-mix(in srgb, var(--foreground) 6%, transparent); }
+.alertChart:hover svg { transform: translate(1px, -1px); }
+.alertDismiss { position: absolute; top: 50%; right: 3.2px; transform: translateY(-50%); display: grid; place-items: center; width: 16px; height: 16px; border: 0; border-radius: 3px; padding: 0; color: var(--muted-foreground); background: transparent; cursor: pointer; }
+.alertDismiss:hover { color: var(--destructive); background: color-mix(in srgb, var(--destructive) 8%, transparent); }
+.alertDismiss:disabled { opacity: 0.45; cursor: not-allowed; }
+.reviewAlert { box-shadow: inset 2px 0 var(--caution); }
+.expiredAlert { border-color: color-mix(in srgb, var(--destructive) 30%, transparent); }
+.expiredAlert .alertName { color: var(--alert-secondary); }
+
+.footer { flex: none; margin-top: 10px; border-top: 1px solid var(--alert-rule); padding-top: 6px; }
+.historyButton { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 34px; padding: 6px 8px; border: 0; border-radius: 4px; background: transparent; color: var(--alert-secondary); font-size: 12px; line-height: 20px; cursor: pointer; }
+.historyButton svg { flex: none; }
+.historyButton svg:last-child { margin-left: auto; }
+.historyButton:hover { color: var(--foreground); background: var(--panel-bg-alt); }
+.emptyState { padding: 24px 8px; color: var(--alert-secondary); text-align: center; }
+.panel button:focus-visible, .panel a:focus-visible { outline: 2px solid var(--info); outline-offset: -2px; }
+.positionAlert:focus-visible { outline: 2px solid var(--info); outline-offset: -2px; }
+
+.portfolioHeading { margin: 0 2px 8px; }
+.portfolioHeading svg { color: var(--caution); }
+.regimeList { display: flex; flex-direction: column; gap: 10px; }
+.regimeAlert { border: 1px solid var(--alert-rule); border-left: 2px solid var(--caution); border-radius: 4px; padding: 10px; background: var(--panel-bg-alt); }
+.regimeHeader { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.regimeIdentity { min-width: 0; }
+.regimeTitle { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; color: var(--foreground); font-size: 13px; font-weight: 500; line-height: 20px; }
+.regimeTitle .signal { font-size: 11px; }
+.regimeDetail { color: var(--alert-secondary); font-size: 11px; font-weight: 400; line-height: 18px; overflow-wrap: anywhere; }
+.affectedList { margin-top: 8px; border-top: 1px solid var(--alert-rule); padding-top: 4px; }
+.affectedRow { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 8px; padding: 4px 0; font-size: 11px; line-height: 18px; }
+.affectedTicker { color: var(--foreground); font-weight: 500; overflow-wrap: anywhere; }
+.affectedAction { font-weight: 500; }
+.regimeActions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.regimeAction { display: flex; align-items: center; justify-content: center; min-height: 32px; border: 1px solid var(--alert-rule); border-radius: 4px; padding: 5px 8px; background: transparent; color: var(--foreground); font-size: 12px; line-height: 20px; cursor: pointer; }
+.regimeAction:hover { background: var(--panel-bg); border-color: var(--alert-secondary); }
+
+@media (min-width: 1024px) and (max-width: 1600px) {
+    .panel { padding: 6px; }
+}
+@media (min-width: 1024px) and (max-width: 1280px) {
+    .panel { padding-inline: 4px; }
+}
+
+/* Keep company identity above the instruction, even in a narrow rail. */
+@media (min-width: 1024px) {
+    .panel { padding-right: 2px; }
+    /* Desktop cards show "5d" rather than "5d ago"; the full age stays in the title and label. */
+    .alertAgeFull { display: none; }
+    .alertAgeCompact { display: inline; }
+    @container alert-stack (max-width: 247px) {
+        .panelHeader { min-height: 28px; margin-bottom: 8px; padding-bottom: 6px; }
+        .scrollArea > * + * { margin-top: 10px; }
+        .riskHeading { margin-bottom: 4px; }
+        .riskCard { padding: 7px 8px; }
+        .riskDetail { margin-top: 3px; }
+        .sectionHeader { min-height: 24px; margin-bottom: 4px; }
+        .alertHeading { gap: 3.2px; }
+        .alertDetails { gap: 3.2px; }
+        .alertSignals { gap: 3.2px; }
+        .alertMetrics { gap: 0; }
+        .alertChart { position: absolute; top: 0; right: 1px; width: 20px; height: 20px; }
+        .alertChart svg { width: 13px; height: 13px; }
+        .alertDismiss { top: auto; bottom: 1px; right: 1px; width: 20px; height: 20px; transform: none; }
+        .footer { margin-top: 6px; padding-top: 4px; }
+        .historyButton { min-height: 28px; padding: 3px 6px; }
+    }
+}
+
+@media (max-width: 1023px) {
+    .panel { padding: 10px; }
+    .groupHeader { min-height: 40px; }
+    .expandButton { width: 32px; height: 32px; }
+    .positionAlert { min-height: 56px; padding: 6px 40px 6px 10px; }
+    .alertName { white-space: normal; overflow-wrap: anywhere; }
+    .positionAlert .signal, .alertDetails { font-size: 11px; line-height: 18px; }
+    .alertChart { width: 24px; height: 24px; }
+    .alertChart svg { width: 15px; height: 15px; }
+    .alertName { font-size: 13px; line-height: 18px; }
+    .alertAge { line-height: 18px; }
+    .alertHeading { align-items: flex-start; }
+    .alertDismiss { right: 4px; width: 32px; height: 32px; }
+    .alertDismiss svg { width: 16px; height: 16px; }
+    .historyButton { min-height: 40px; }
+}

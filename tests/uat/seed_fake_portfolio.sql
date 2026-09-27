@@ -1,0 +1,152 @@
+INSERT INTO account_statements (
+  account_name,
+  statement_date,
+  total_value_aud,
+  cash_aud,
+  usd_value,
+  usd_aud,
+  gbp_value,
+  gbp_aud,
+  aud_value
+) VALUES (
+  'UAT Portfolio',
+  '2026-04-14 09:00:00',
+  111000,
+  3000,
+  0,
+  0,
+  0,
+  0,
+  111000
+);
+
+INSERT INTO stock_groups (id, name, collapsed, display_order, parent_id) VALUES
+  ('gold', 'Gold', 0, 10, NULL),
+  ('silver', 'Silver', 0, 20, NULL),
+  ('copper', 'Copper', 0, 30, NULL),
+  ('basemetals', 'Base Metals', 0, 40, NULL),
+  ('lithium', 'Lithium', 0, 50, NULL),
+  ('uranium', 'Uranium', 0, 60, NULL),
+  ('ree', 'Rare Earths', 0, 70, NULL),
+  ('insurance', 'Insurance', 0, 80, NULL),
+  ('staples', 'Staples', 0, 90, NULL),
+  ('gambling', 'Gambling', 0, 100, NULL),
+  ('technology', 'Technology', 0, 110, NULL),
+  ('energy', 'Energy', 0, 120, NULL),
+  ('pharma', 'Pharma', 0, 130, NULL),
+  ('healthcare', 'Healthcare', 0, 140, NULL);
+
+INSERT INTO holdings (
+  isin,
+  ticker,
+  company_name,
+  exchange_prefix,
+  quantity,
+  cost_aud,
+  current_price,
+  value_aud,
+  gain_loss_aud,
+  gain_loss_pct,
+  currency,
+  market_value,
+  cash_reserve,
+  is_active,
+  last_synced_at
+) VALUES
+  ('UAT0001', 'GOLD1', 'UAT Gold Producer', 'ASX:', 1000, 15000, 18, 18000, 3000, 20.0, 'AUD', 18000, 2500, 1, CURRENT_TIMESTAMP),
+  ('UAT0002', 'SILV1', 'UAT Silver Producer', 'ASX:', 1000, 7000, 8, 8000, 1000, 14.3, 'AUD', 8000, 500, 1, CURRENT_TIMESTAMP),
+  ('UAT0003', 'COPR1', 'UAT Copper Producer', 'ASX:', 1000, 5000, 6, 6000, 1000, 20.0, 'AUD', 6000, 0, 1, CURRENT_TIMESTAMP),
+  ('UAT0004', 'BASE1', 'UAT Base Metals Producer', 'ASX:', 1000, 3500, 4, 4000, 500, 14.3, 'AUD', 4000, 800, 1, CURRENT_TIMESTAMP),
+  ('UAT0005', 'LITH1', 'UAT Lithium Producer', 'ASX:', 1000, 1500, 2, 2000, 500, 33.3, 'AUD', 2000, 0, 1, CURRENT_TIMESTAMP),
+  ('UAT0006', 'URAN1', 'UAT Uranium Producer', 'ASX:', 1000, 4500, 5, 5000, 500, 11.1, 'AUD', 5000, 300, 1, CURRENT_TIMESTAMP),
+  ('UAT0007', 'REE1', 'UAT Rare Earths Producer', 'ASX:', 1000, 2800, 4, 4000, 1200, 42.9, 'AUD', 4000, 600, 1, CURRENT_TIMESTAMP),
+  ('UAT0008', 'INS1', 'UAT Insurance Group', 'ASX:', 1000, 6500, 7, 7000, 500, 7.7, 'AUD', 7000, 0, 1, CURRENT_TIMESTAMP),
+  ('UAT0009', 'STAP1', 'UAT Staples Group', 'ASX:', 1000, 4500, 5, 5000, 500, 11.1, 'AUD', 5000, 0, 1, CURRENT_TIMESTAMP),
+  ('UAT0010', 'GAMB1', 'UAT Gambling Group', 'ASX:', 1000, 3500, 4, 4000, 500, 14.3, 'AUD', 4000, 0, 1, CURRENT_TIMESTAMP),
+  ('UAT0011', 'TECH1', 'UAT Data Centre Operator', 'ASX:', 1000, 11000, 12, 12000, 1000, 9.1, 'AUD', 12000, 0, 1, CURRENT_TIMESTAMP),
+  ('UAT0012', 'ENRG1', 'UAT Energy Producer', 'ASX:', 1000, 17000, 18, 18000, 1000, 5.9, 'AUD', 18000, 0, 1, CURRENT_TIMESTAMP),
+  ('UAT0013', 'PHRM1', 'UAT Commercial Pharma', 'NASDAQ:', 1000, 9000, 10, 10000, 1000, 11.1, 'AUD', 10000, 0, 1, CURRENT_TIMESTAMP),
+  ('UAT0014', 'HLTH1', 'UAT Healthcare Devices', 'ASX:', 1000, 4500, 5, 5000, 500, 11.1, 'AUD', 5000, 500, 1, CURRENT_TIMESTAMP);
+
+INSERT INTO statement_holdings (
+  statement_id,
+  details,
+  quantity,
+  cost_aud,
+  current_price,
+  value_aud,
+  gain_loss_aud,
+  gain_loss_pct,
+  currency,
+  market_value,
+  cash_reserve
+)
+SELECT
+  (SELECT id FROM account_statements WHERE account_name = 'UAT Portfolio' ORDER BY id DESC LIMIT 1),
+  company_name,
+  quantity,
+  cost_aud,
+  current_price,
+  value_aud,
+  gain_loss_aud,
+  gain_loss_pct,
+  currency,
+  market_value,
+  cash_reserve
+FROM holdings
+WHERE is_active = 1;
+
+INSERT INTO stock_group_assignments (company_name, group_id) VALUES
+  ('UAT Gold Producer', 'gold'),
+  ('UAT Silver Producer', 'silver'),
+  ('UAT Copper Producer', 'copper'),
+  ('UAT Base Metals Producer', 'basemetals'),
+  ('UAT Lithium Producer', 'lithium'),
+  ('UAT Uranium Producer', 'uranium'),
+  ('UAT Rare Earths Producer', 'ree'),
+  ('UAT Insurance Group', 'insurance'),
+  ('UAT Staples Group', 'staples'),
+  ('UAT Gambling Group', 'gambling'),
+  ('UAT Data Centre Operator', 'technology'),
+  ('UAT Energy Producer', 'energy'),
+  ('UAT Commercial Pharma', 'pharma'),
+  ('UAT Healthcare Devices', 'healthcare');
+
+INSERT INTO stock_analysis (
+  ticker,
+  name,
+  grok_quality,
+  grok_value,
+  gemini_quality,
+  gemini_value,
+  gpt_quality,
+  gpt_value,
+  grok_pt,
+  gemini_pt,
+  gpt_pt,
+  tipranks_pt,
+  analyst_pt,
+  upside_24m,
+  allocation,
+  primary_asset_class,
+  overlay_sell_priority,
+  market_cap,
+  risk_profile,
+  notes,
+  updated_at,
+  created_at
+) VALUES
+  ('GOLD1', 'UAT Gold Producer', 8, 7, 8, 7, 8, 7, 24, 24, 24, 0, 0, 33, 35, 'GOLD', 3, 'Mid', 'Medium', 'UAT seed', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('SILV1', 'UAT Silver Producer', 7, 6, 7, 6, 7, 6, 12, 12, 12, 0, 0, 20, 18, 'SILVER', 3, 'Small', 'High', 'UAT seed', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('COPR1', 'UAT Copper Producer', 7, 7, 7, 7, 7, 7, 9, 9, 9, 0, 0, 25, 15, 'COPPER', 3, 'Small', 'High', 'UAT seed', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('BASE1', 'UAT Base Metals Producer', 6, 6, 6, 6, 6, 6, 6, 6, 6, 0, 0, 18, 10, 'BASEMETALS', 3, 'Small', 'High', 'UAT seed', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('LITH1', 'UAT Lithium Producer', 5, 5, 5, 5, 5, 5, 3, 3, 3, 0, 0, 15, 5, 'LITHIUM', 2, 'Micro', 'High', 'UAT seed', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('URAN1', 'UAT Uranium Producer', 7, 6, 7, 6, 7, 6, 8, 8, 8, 0, 0, 22, 10, 'URANIUM', 3, 'Small', 'High', 'UAT seed', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('REE1', 'UAT Rare Earths Producer', 5, 5, 5, 5, 5, 5, 4, 4, 4, 0, 0, 18, 7, 'REE', 2, 'Micro', 'High', 'UAT seed', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('INS1', 'UAT Insurance Group', 8, 8, 8, 8, 8, 8, 10, 10, 10, 0, 0, 16, 25, 'INSURANCE', 5, 'Large', 'Medium', 'UAT seed', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('STAP1', 'UAT Staples Group', 8, 7, 8, 7, 8, 7, 7, 7, 7, 0, 0, 14, 20, 'STAPLES', 5, 'Large', 'Low', 'UAT seed', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('GAMB1', 'UAT Gambling Group', 7, 7, 7, 7, 7, 7, 7, 7, 7, 0, 0, 18, 15, 'GAMBLING', 5, 'Large', 'Medium', 'UAT seed', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('TECH1', 'UAT Data Centre Operator', 8, 6, 8, 6, 8, 6, 15, 15, 15, 0, 0, 28, 30, 'TECHNOLOGY', 1, 'Large', 'High', 'UAT seed', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('ENRG1', 'UAT Energy Producer', 8, 8, 8, 8, 8, 8, 18, 18, 18, 0, 0, 24, 40, 'ENERGY', 3, 'Large', 'Medium', 'UAT seed', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('PHRM1', 'UAT Commercial Pharma', 8, 8, 8, 8, 8, 8, 16, 16, 16, 0, 0, 20, 30, 'PHARMA', 3, 'Large', 'Medium', 'UAT seed', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('HLTH1', 'UAT Healthcare Devices', 7, 7, 7, 7, 7, 7, 8, 8, 8, 0, 0, 16, 15, 'HEALTHCARE', 3, 'Mid', 'Medium', 'UAT seed', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);

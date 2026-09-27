@@ -1,0 +1,12 @@
+Alpha Edge
+Copyright 2026 Tom Bryson and Alpha Edge contributors.
+
+This source is licensed under the Apache License, Version 2.0.
+Third-party dependencies retain their own licences and notices. Refer to
+package-lock.json and backend/go.sum for the pinned dependency identities.
+
+Alpha Edge is independent software. References to brokers, exchanges, data
+providers and model providers do not imply endorsement or affiliation.
+No rights to third-party services, datasets or trademarks are granted here.
+The software is provided without warranty; it is not a promise of investment
+performance, brokerage execution or access to a hosted private account.

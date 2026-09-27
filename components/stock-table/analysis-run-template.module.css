@@ -1,0 +1,107 @@
+.body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.toolbar select {
+    min-width: 0;
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--background);
+    color: var(--foreground);
+    padding: 6px 8px;
+    font-size: 12px;
+}
+
+.identity {
+    flex-shrink: 0;
+    color: var(--muted-foreground);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+}
+
+.prompt {
+    flex: 1;
+    min-height: 100px;
+    width: 100%;
+    resize: none;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--background);
+    color: var(--foreground);
+    padding: 12px;
+    font: inherit;
+    font-size: 12px;
+    line-height: 1.55;
+    letter-spacing: 0;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 0.7rem;
+    height: var(--analysis-run-actions-height);
+}
+
+.actions button,
+.error button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 30px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 6px 9px;
+    background: transparent;
+    color: var(--foreground);
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.actions .copy {
+    border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
+    background: color-mix(in srgb, var(--primary) 10%, var(--background));
+    color: var(--primary);
+}
+
+.actions button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.actions button:not(:disabled):hover,
+.error button:hover {
+    border-color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 12%, var(--background));
+}
+
+.body :focus-visible,
+.actions :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.warning,
+.error,
+.status {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.warning { color: var(--muted-foreground); }
+.error { color: var(--destructive); }
+.status { color: var(--muted-foreground); }
+.error button { margin-left: 8px; }

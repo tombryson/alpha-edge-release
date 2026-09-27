@@ -1,0 +1,129 @@
+/* Rail handle — the grab strip on the inside edge of each side panel.
+
+   One element, used twice. The left and right handles are the same component
+   with the same rules; the ONLY thing that differs between them is which edge
+   they sit on and which edge the grip sits against. Everything else — the hit
+   area, the grip size and radius, every fill, every border, every dot, and all
+   four states — is shared, so the two are mirror images by construction and
+   cannot drift apart.
+
+   Colour is mixed from --card-foreground, the theme's own reading colour for
+   this surface. It inverts by construction — light on a dark theme, dark on a
+   light one — so a step toward it is always a step away from the background.
+   --primary is not usable here: a saturated accent in some themes, a plain
+   neutral in theme1, so one rule would be a stripe of paint in one theme and
+   nothing at all in another. */
+
+.handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: 10;
+    width: var(--shell-handle-width, 0.75rem);
+    padding: 0;
+    border: 0;
+    /* The column carries the rail's own surface, so no page background shows
+       between the panel and the grip. */
+    background: var(--panel-bg);
+    cursor: pointer;
+    outline: none;
+    transition: background-color 120ms ease;
+}
+
+.grip {
+    position: absolute;
+    top: 6px;
+    bottom: 6px;
+    display: flex;
+    width: 6px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    border-radius: 4px;
+    border: 1px solid color-mix(in srgb, var(--border) 75%, var(--foreground));
+    background: var(--secondary);
+    transition:
+        background-color 120ms ease,
+        border-color 120ms ease;
+}
+
+.dot {
+    width: 3px;
+    height: 3px;
+    border-radius: 999px;
+    background: var(--muted-foreground);
+    transition: background-color 120ms ease;
+}
+
+/* ── the only per-side rules: which edge, mirrored ─────────────────────── */
+
+.left {
+    right: 0;
+}
+
+.left .grip {
+    right: 3px;
+}
+
+.right {
+    left: 0;
+}
+
+.right .grip {
+    left: 3px;
+}
+
+/* ── hover / keyboard focus ───────────────────────────────────────────── */
+
+/* The whole 12px column takes a faint wash, so the click target lights up and
+   not just the 6px grip inside it. */
+.handle:hover,
+.handle:focus-visible {
+    background: color-mix(in srgb, var(--card-foreground) 5%, var(--panel-bg));
+}
+
+.handle:hover .grip,
+.handle:focus-visible .grip {
+    background: color-mix(in srgb, var(--card-foreground) 12%, var(--secondary));
+    border-color: color-mix(in srgb, var(--border) 45%, var(--foreground));
+}
+
+.handle:hover .dot,
+.handle:focus-visible .dot {
+    background: color-mix(in srgb, var(--muted-foreground) 40%, var(--card-foreground));
+}
+
+/* ── minimised ────────────────────────────────────────────────────────── */
+
+/* The grip fills instead of outlining: a solid mark, rather than a line that
+   could be mistaken for the window edge. */
+.snapped .grip {
+    background: color-mix(in srgb, var(--card-foreground) 22%, var(--card));
+    border-color: color-mix(in srgb, var(--border) 45%, var(--card-foreground));
+}
+
+.snapped .dot {
+    background: color-mix(in srgb, var(--card-foreground) 80%, var(--card));
+}
+
+.snapped:hover .grip,
+.snapped:focus-visible .grip {
+    background: color-mix(in srgb, var(--card-foreground) 60%, var(--card));
+    border-color: color-mix(in srgb, var(--card-foreground) 70%, var(--border));
+}
+
+/* Dots invert to the surface once the grip is near-solid, so they read as holes
+   punched in it rather than vanishing into the fill. */
+.snapped:hover .dot,
+.snapped:focus-visible .dot {
+    background: var(--card);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .handle,
+    .grip,
+    .dot {
+        transition: none;
+    }
+}

@@ -1,0 +1,29 @@
+# GET-only local examples. Replace variables in your HTTP client.
+# Some GET handlers reconcile stored state; consult the API reference first.
+# Never commit credentials or point mutation examples at production.
+@terminal = http://localhost:8080
+@frontend = http://localhost:3100
+@token = REPLACE_LOCALLY
+
+### Liveness (no authentication; not proof of data freshness)
+GET {{terminal}}/api/health
+
+### Stored source freshness; does not request provider refresh
+GET {{terminal}}/api/data-freshness
+Authorization: Bearer {{token}}
+
+### Configured TradingView connections
+GET {{terminal}}/api/alerts/active
+Authorization: Bearer {{token}}
+
+### Action evidence, including closed records
+GET {{terminal}}/api/security-actions?includeHistory=true
+Authorization: Bearer {{token}}
+
+### Portfolio shape and memo history
+GET {{terminal}}/api/portfolio-history?limit=20
+Authorization: Bearer {{token}}
+
+### Existing Council jobs, through the FRONTEND origin
+GET {{frontend}}/api/council/jobs
+Authorization: Bearer {{token}}

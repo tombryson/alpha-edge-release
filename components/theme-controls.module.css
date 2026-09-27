@@ -1,0 +1,10 @@
+.paletteIcon {
+    color: var(--caution);
+    fill: color-mix(in srgb, var(--caution) 16%, var(--card));
+}
+
+.paletteIcon circle { fill: currentColor; }
+.paletteIcon circle:nth-of-type(1) { color: var(--destructive); }
+.paletteIcon circle:nth-of-type(2) { color: var(--info); }
+.paletteIcon circle:nth-of-type(3) { color: var(--success); }
+.paletteIcon circle:nth-of-type(4) { color: var(--caution); }

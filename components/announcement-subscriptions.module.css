@@ -1,0 +1,45 @@
+.panel { width: 100%; min-width: 0; color: var(--foreground); background: var(--background); border: 1px solid var(--alerts-grid-border-muted); font-size: 13px; letter-spacing: 0; }
+.toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 10px; background: var(--panel-bg-alt); border-bottom: 1px solid var(--alerts-grid-border); }
+.tabs { display: flex; gap: 4px; flex-shrink: 0; }
+.tabs button { min-height: 30px; padding: 4px 8px; border: 0; border-bottom: 2px solid transparent; color: var(--muted-foreground); cursor: pointer; }
+.tabs button[aria-pressed='true'] { color: var(--foreground); background: color-mix(in srgb, var(--foreground) 5%, transparent); border-bottom-color: var(--primary); }
+.tabs span { margin-left: 5px; font-variant-numeric: tabular-nums; color: var(--muted-foreground); }
+.search { display: flex; align-items: center; gap: 7px; min-width: 0; width: 240px; color: var(--muted-foreground); }
+.search input { width: 100%; min-width: 0; padding: 6px 0; background: transparent; outline: none; }
+.search:focus-within { color: var(--foreground); }
+.list { min-height: 90px; }
+.columnHead, .row { display: grid; grid-template-columns: 18px minmax(0, 1fr) 138px 64px; gap: 10px; align-items: center; padding: 5px 10px; border-bottom: 1px solid var(--alerts-grid-border); }
+.columnHead { background: var(--card); color: var(--muted-foreground); font-size: 12px; min-height: 32px; }
+.row { min-height: 44px; background: var(--alerts-row-surface); }
+.row:nth-child(odd) { background: var(--alerts-row-surface-alt); }
+.row:hover { background: var(--alerts-row-surface-hover); }
+.row input, .columnHead input { width: 14px; height: 14px; accent-color: var(--primary); cursor: pointer; }
+.security { min-width: 0; }
+.security strong { display: block; font-weight: 500; font-size: 13px; line-height: 18px; overflow-wrap: anywhere; }
+.security > span { display: flex; flex-wrap: wrap; gap: 7px; font-size: 11px; line-height: 17px; color: var(--muted-foreground); }
+.security em { font-style: normal; color: var(--caution); }
+.security .confirmed { color: var(--muted-foreground); }
+.row select { width: 100%; min-height: 30px; padding: 4px 5px; border: 1px solid var(--border); border-radius: 3px; color: var(--foreground); background: var(--background); font-size: 12px; }
+.actions { display: flex; justify-content: flex-end; gap: 4px; }
+.icon { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; padding: 0; flex: 0 0 30px; border: 1px solid transparent; border-radius: 3px; color: var(--muted-foreground); cursor: pointer; }
+.icon:hover { background: color-mix(in srgb, var(--foreground) 7%, transparent); color: var(--foreground); }
+.confirm { color: var(--primary); border-color: color-mix(in srgb, var(--primary) 30%, transparent); }
+.footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 8px 10px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted-foreground); }
+.primary { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 32px; padding: 5px 10px; border: 1px solid color-mix(in srgb, var(--primary) 40%, transparent); border-radius: 3px; color: var(--primary); background: color-mix(in srgb, var(--primary) 9%, transparent); cursor: pointer; }
+.panel :is(button, input, select):disabled { opacity: .45; cursor: not-allowed; }
+.panel :is(button, a, input, select):focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.empty { padding: 24px 18px; color: var(--muted-foreground); }
+.error { margin: 0; padding: 10px 18px; color: var(--destructive); font-size: 12px; }
+.error button { text-decoration: underline; cursor: pointer; }
+@media (max-width: 560px) {
+    .toolbar { flex-wrap: wrap; gap: 5px; }
+    .search { width: 100%; }
+    .toolbar, .footer { padding-left: 10px; padding-right: 10px; }
+    .columnHead { display: none; }
+    .row { grid-template-columns: 18px minmax(0, 1fr) 68px; gap: 5px 9px; padding: 9px 12px; }
+    .row > input { grid-row: 1 / 3; }
+    .security { grid-column: 2; }
+    .row select { grid-column: 2; grid-row: 2; max-width: 160px; }
+    .actions { grid-column: 3; grid-row: 1 / 3; }
+    .icon { min-height: 32px; }
+}

@@ -1,0 +1,22 @@
+.access-screen { min-height: 100dvh; display: grid; place-items: center; padding: 24px; background: var(--background); color: var(--foreground); }
+.access-panel, .access-dialog { width: min(100%, 460px); padding: 28px; background: var(--card, var(--background)); color: var(--foreground); border: 1px solid var(--border); border-radius: 8px; font-size: 14px; line-height: 1.5; }
+.access-panel h1 { font-size: 20px; font-weight: 600; }
+.access-panel h2, .access-dialog h2 { font-size: 18px; font-weight: 500; margin: 20px 0 8px; }
+.access-brand { display: flex; gap: 12px; align-items: center; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.access-panel p, .access-dialog p { color: var(--muted-foreground); margin-bottom: 18px; }
+.access-panel button, .access-dialog button { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 4px; margin-top: 10px; cursor: pointer; }
+.access-panel button:hover, .access-dialog button:hover { background: var(--muted); }
+.access-panel .access-primary, .access-dialog .access-primary { color: var(--primary); border-color: var(--primary); background: color-mix(in srgb, var(--primary) 10%, transparent); font-weight: 600; }
+.access-panel button:disabled, .access-dialog button:disabled { opacity: .5; cursor: default; }
+.access-panel label, .access-dialog label { display: block; }
+.access-panel input[type=password] { display: block; width: 100%; margin: 6px 0 16px; padding: 10px; background: var(--background); border: 1px solid var(--border); border-radius: 4px; }
+.access-panel .access-error, .access-dialog .access-error { color: var(--destructive, #ef4444); margin: 12px 0; overflow-wrap: anywhere; }
+.access-notice { color: var(--primary) !important; }
+.access-codes { display: grid; gap: 8px; padding: 12px; background: var(--background); border: 1px solid var(--border); max-height: 240px; overflow: auto; }
+.access-codes code { font-size: 12px; overflow-wrap: anywhere; user-select: all; }
+.access-panel .access-check { display: flex; gap: 8px; align-items: center; margin-top: 20px; }
+.access-dialog { margin: auto; max-height: calc(100dvh - 32px); overflow: auto; }
+.access-dialog::backdrop { background: #0007; }
+.access-dialog .access-close { width: 32px; min-height: 32px; margin: 0 0 0 auto; padding: 4px; }
+.access-demo { color: var(--primary); font-size: 12px; border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; }
+@media (max-width: 480px) { .access-screen { padding: 16px; } .access-panel, .access-dialog { padding: 20px; } }

@@ -1,0 +1,834 @@
+{
+  "GET /api/watchlist/opportunities": {
+    "summary": "Preview unheld watchlist entries without reserving cash or altering holdings.",
+    "description": "Authenticated, read-only assessment. Each candidate uses the same available pool independently; displayed tickets must not be summed. Uses current deployment permissions, statement-backed funding, held-plus-candidate weights, ten-stock class limit and optional weight ceiling. READY means ready for review, not a verified execution price or broker order. Peers show hypothetical Ideal weights, not trade instructions. Outperform is evidence against the configured benchmark. Lists exclude held, external and non-allocating instruments. Response is no-store; clients should share one refresh subscription and paginate rendered rows.",
+    "responses": {
+      "200": { "description": "Current entry alternatives and explicit blockers.", "content": { "application/json": { "schema": {
+        "type": "object", "required": ["items", "as_of"], "properties": {
+          "as_of": { "type": "string", "format": "date-time" },
+          "items": { "type": "array", "items": {
+            "type": "object", "required": ["id", "ticker", "name", "asset_class", "class_name", "signal", "outperform", "state", "reason", "entry", "ideal_pct", "class_now", "class_after", "class_limit", "class_cash", "peers"],
+            "properties": {
+              "id": { "type": "integer" }, "ticker": { "type": "string" }, "name": { "type": "string" },
+              "asset_class": { "type": "string" }, "class_name": { "type": "string" },
+              "signal": { "type": "string", "description": "Current position direction, or BREAKOUT when an active breakout coexists with BUY." },
+              "signal_at": { "type": "string", "description": "Latest active alert receipt time when available." },
+              "outperform": { "enum": ["BUY", "SELL", "UNKNOWN"] }, "benchmark": { "type": "string" },
+              "state": { "type": "string", "description": "READY, RESEARCH, DATA, PENDING, CAPACITY, FUNDING, WAITING, BLOCKED, or an existing deployment permission state. Unknown states must not be treated as READY." },
+              "reason": { "type": "string" }, "entry": { "type": "number", "minimum": 0 },
+              "ideal_pct": { "type": ["number", "null"], "description": "Prospective share of approved whole-class budget; null when unavailable." },
+              "class_now": { "type": "number" }, "class_after": { "type": "number" }, "class_limit": { "type": "number" },
+              "class_cash": { "type": "number" }, "action_id": { "type": "integer", "minimum": 1 },
+              "peers": { "type": "array", "items": { "type": "object", "required": ["ticker", "before", "after"], "properties": {
+                "ticker": { "type": "string" }, "before": { "type": "number" }, "after": { "type": "number" }
+              } } }
+            }
+          } }
+        }
+      } } } },
+      "401": { "description": "Authentication required." },
+      "503": { "description": "Assessment unavailable; plain-text error. Clients must clear any previous ready state." }
+    }
+  },
+  "GET /api/backup-status": {
+    "summary": "Read encrypted backup and restore-verification status.",
+    "description": "Read-only. Disabled unless explicitly configured. Last success means an encrypted snapshot was downloaded, checksum-matched and SQLite-verified. Contains no storage credentials or repository URL. Does not trigger a backup."
+  },
+  "GET /api/statements/{id}/revisions": {
+    "summary": "List immutable statement revisions, newest first.",
+    "description": "Authenticated read-only metadata, at most 100 revisions. Pass the last revision number as before for another page. Consecutive identical normalized imports share a revision; corrected A-B-A submissions retain three revisions. Legacy snapshots are explicitly labelled, not reconstructed originals. An unknown statement returns an empty list."
+  },
+  "GET /api/statements/{id}/revisions/{revision}": {
+    "summary": "Read a preserved statement revision and accepted import fields.",
+    "description": "Read-only audit evidence. Revisions never replace the latest statement projection automatically and cannot be updated or deleted through this API. Older PDFs and corrections predating migration 7 cannot be recovered from these snapshots."
+  },
+  "GET /api/announcement-subscriptions": {
+    "summary": "Read per-security announcement email setup confirmations.",
+    "description": "Read-only union of active nonzero holdings and Analysis securities, excluding NON_ALLOCATING/CVR. Deduplicated by security identity. OUT research remains included. Configured records are user assertions, not provider or router delivery verification; a changed listing returns configured=false and needs_recheck=true.",
+    "responses": {
+      "200": { "description": "Current setup list, including unconfirmed securities.", "content": { "application/json": { "schema": {
+        "type": "object", "required": ["items"], "properties": { "items": { "type": "array", "items": {
+          "type": "object", "required": ["kind", "id", "security_id", "name", "ticker", "exchange_prefix", "provider", "configured", "needs_recheck"],
+          "properties": {
+            "kind": { "enum": ["holding", "analysis"] }, "id": { "type": "integer", "minimum": 1 },
+            "security_id": { "type": "integer", "minimum": 0 }, "name": { "type": "string" },
+            "ticker": { "type": "string" }, "exchange_prefix": { "type": "string" },
+            "provider": { "enum": ["", "HOTCOPPER", "SEEKING_ALPHA"] }, "configured": { "type": "boolean" },
+            "confirmed_at": { "type": "string", "format": "date-time" }, "needs_recheck": { "type": "boolean" }
+          }
+        } } }
+      } } } },
+      "401": { "description": "Authentication required." },
+      "500": { "description": "Setup could not be loaded; plain-text error." }
+    }
+  },
+  "PATCH /api/announcement-subscriptions": {
+    "summary": "Confirm or reset announcement email setup for up to 100 securities atomically.",
+    "description": "Use kind/id and the exact ticker/exchange_prefix from GET. Requires explicit provider and configured boolean. A true confirmation requires both ticker and exchange. Does not subscribe at the provider, verify delivery, create a trading alert or affect sizing. Unknown/stale/hidden targets reject the whole batch. Repeated matching confirmations retain confirmed_at; false clears it and retains the selected provider.",
+    "requestBody": { "required": true, "content": { "application/json": { "schema": {
+      "type": "object", "additionalProperties": false, "required": ["items"], "properties": { "items": {
+        "type": "array", "minItems": 1, "maxItems": 100, "items": {
+          "type": "object", "additionalProperties": false, "required": ["kind", "id", "ticker", "exchange_prefix", "provider", "configured"],
+          "properties": {
+            "kind": { "enum": ["holding", "analysis"] }, "id": { "type": "integer", "minimum": 1 },
+            "ticker": { "type": "string" }, "exchange_prefix": { "type": "string" },
+            "provider": { "enum": ["HOTCOPPER", "SEEKING_ALPHA"] }, "configured": { "type": "boolean" }
+          }
+        }
+      } }
+    } } } },
+    "responses": {
+      "200": { "description": "Batch saved. Reread GET for current identities/status.", "content": { "application/json": { "schema": { "type": "object", "required": ["updated"], "properties": { "updated": { "type": "integer", "minimum": 1, "maximum": 100 } } } } } },
+      "400": { "description": "Invalid, duplicate, oversized or missing input; plain-text error." },
+      "401": { "description": "Authentication required." },
+      "403": { "description": "Session origin/CSRF rejected, or read-only demo." },
+      "409": { "description": "Listing or eligible security changed; reload before confirming. Plain-text error; no partial writes." },
+      "500": { "description": "Storage error; plain-text error." }
+    }
+  },
+  "GET /api/weight-policy": { "summary": "Read optional weight management mode and backend-owned Ideal wt references." },
+  "PATCH /api/weight-policy": { "summary": "Change optional weight management using optimistic epoch checking; preserve recorded executions." },
+  "GET /api/auth/session": { "summary": "Read owner enrollment and session status." },
+  "POST /api/auth/check": { "summary": "Verify session and CSRF or machine credentials without executing a job." },
+  "POST /api/auth/register/start": { "summary": "Begin first or backup passkey registration." },
+  "POST /api/auth/register/finish": { "summary": "Verify registration and issue an owner session." },
+  "POST /api/auth/login/start": { "summary": "Begin owner passkey authentication." },
+  "POST /api/auth/login/finish": { "summary": "Verify passkey assertion and rotate the session." },
+  "POST /api/auth/recover": { "summary": "Consume an offline code for registration-only recovery." },
+  "POST /api/auth/logout": { "summary": "Revoke the current session." },
+  "POST /api/auth/refresh": { "summary": "Refresh idle expiry for an active owner session." },
+  "POST /api/auth/revoke-all": { "summary": "End all owner sessions after recent authentication." },
+  "GET /api/source-research/templates": { "summary": "List source research templates and provider configuration." },
+  "GET /api/source-research/jobs": { "summary": "List saved source research for a security." },
+  "POST /api/source-research/jobs": { "summary": "Queue one explicitly requested paid source-retrieval job." },
+  "GET /api/source-research/jobs/{id}": { "summary": "Read a source research run and its saved evidence." },
+  "POST /api/source-research/jobs/{id}/recover": { "summary": "Recover an uncertain submission using an existing Parallel run." },
+  "GET /api/alerts": {
+    "summary": "List alert rows."
+  },
+  "POST /api/alerts": {
+    "summary": "Create a manual alert."
+  },
+  "POST /api/alerts/{id}/dismiss": {
+    "summary": "Dismiss an alert without recording a trading decision. Sets `resolved_reason = DISMISSED` unless the alert already has a decision resolution."
+  },
+  "POST /api/alerts/{id}/resolve": {
+    "summary": "Resolve unmapped alert."
+  },
+  "GET /api/alerts/active": {
+    "summary": "List registered TradingView alert setups."
+  },
+  "POST /api/alerts/active/remove": {
+    "summary": "Remove a TradingView alert setup."
+  },
+  "POST /api/alerts/active/setup": {
+    "summary": "Register a standard TradingView alert setup. Stock CDF and ETF TMS setup require an explicit current `BUY` or `SELL` state; TMS setup registers its connection only.",
+    "requestBody": {
+      "required": true,
+      "description": "Canonical payload. Script aliases and direction case are normalised by the handler. CDF and ETF TMS require current BUY/SELL; TMS registers a connection without requiring direction. The fund management mode must accept this script.",
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "ticker": {
+                "type": "string",
+                "minLength": 1
+              },
+              "script": {
+                "type": "string",
+                "enum": [
+                  "cdf",
+                  "tms",
+                  "etf_tms"
+                ]
+              },
+              "position_state": {
+                "type": "string"
+              },
+              "analyst_price_target": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "company_name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "ticker",
+              "script"
+            ],
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "script": {
+                      "enum": [
+                        "cdf",
+                        "etf_tms"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "script"
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "position_state"
+                  ],
+                  "properties": {
+                    "position_state": {
+                      "enum": [
+                        "BUY",
+                        "SELL",
+                        "buy",
+                        "sell"
+                      ]
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "GET /api/alerts/stream": {
+    "summary": "SSE alert stream."
+  },
+  "GET /api/alerts/unmapped": {
+    "summary": "List alerts requiring ticker mapping."
+  },
+  "GET /api/analysis": {
+    "summary": "List analysis rows."
+  },
+  "POST /api/analysis": {
+    "summary": "Upsert analysis row."
+  },
+  "DELETE /api/analysis/{id}": {
+    "summary": "Delete analysis row."
+  },
+  "PATCH /api/analysis/{id}": {
+    "summary": "Update analysis row."
+  },
+  "POST /api/analysis/{id}/contribute": {
+    "summary": "Log contribution."
+  },
+  "PATCH /api/analysis/{id}/rename": {
+    "summary": "Rename analysis row."
+  },
+  "POST /api/analysis/classify-asset-class": {
+    "summary": "Use the configured xAI/Grok classifier to propose one canonical asset class with confidence and reason."
+  },
+  "POST /api/analysis/contribute-by-name": {
+    "summary": "Log contribution by name."
+  },
+  "GET /api/analysis/listing-reviews": {
+    "summary": "List open advisory name/liveness reviews for watchlist identities."
+  },
+  "POST /api/analysis/exchanges/auto-assign": {
+    "summary": "Fill missing exchanges for up to five explicitly selected securities; preserve existing assignments.",
+    "description": "Authenticated, explicit mutation. Reads names and tickers from the database, not from client assertions. Checks local records, then exact Yahoo search and listing metadata; optional Sonar discovery requires PERPLEXITY_API_KEY and still requires independent listing validation. Ambiguous listings, identity conflicts, missing tickers, changed records and provider failures remain review results. Each successful security and its matching live references update in a transaction. No automatic identity merges or historical/financial writes. Concurrent batches return 409. A 200 response may contain partial success. No request retries; a repeat skips already-qualified records. Maximum five items keeps the request bounded; clients may submit successive batches.",
+    "requestBody": {
+      "required": true,
+      "content": { "application/json": { "schema": {
+        "type": "object", "additionalProperties": false, "required": ["items"],
+        "properties": { "items": {
+          "type": "array", "minItems": 1, "maxItems": 5, "uniqueItems": true,
+          "items": { "type": "object", "additionalProperties": false, "required": ["kind", "id"],
+            "properties": { "kind": { "type": "string", "enum": ["holding", "analysis"] }, "id": { "type": "integer", "minimum": 1 } }
+          }
+        } }
+      } } }
+    },
+    "responses": {
+      "200": { "description": "Per-security outcomes in request order. Review reasons describe unresolved cases, not instructions to trade.", "content": { "application/json": { "schema": {
+        "type": "object", "required": ["results"], "properties": { "results": { "type": "array", "maxItems": 5, "items": {
+          "type": "object", "required": ["kind", "id", "name", "ticker", "status", "exchange_prefix", "source"],
+          "properties": {
+            "kind": { "type": "string", "enum": ["holding", "analysis"] }, "id": { "type": "integer" },
+            "name": { "type": "string" }, "ticker": { "type": "string" },
+            "status": { "type": "string", "enum": ["assigned", "review", "skipped"] },
+            "reason": { "type": "string" }, "exchange_prefix": { "type": "string" }, "source": { "type": "string" }
+          }
+        } } }
+      } } } },
+      "400": { "description": "Invalid, oversized, duplicate or unknown request fields; plain-text error." },
+      "401": { "description": "Missing or invalid API bearer token." },
+      "409": { "description": "Another assignment batch is running; plain-text error." }
+    }
+  },
+  "POST /api/analysis/performance/refresh": {
+    "summary": "Refresh trailing analysis performance metrics, including six-month return where available."
+  },
+  "POST /api/analysis/refresh-prices": {
+    "summary": "Refresh watchlist prices and record advisory listing observations. Returns `updated`, `errors`, `open_reviews`, and `new_reviews`; it never changes identity metadata."
+  },
+  "POST /api/analysis/security-type": {
+    "summary": "Set `STOCK`, `ETF`, `CVR`, or `NON_ALLOCATING` treatment and primary asset class. Non-allocating types clear class and allocation."
+  },
+  "GET /api/asset-class-config": {
+    "summary": "List portfolio-risk asset-class settings and alert presentation metadata. Do not use as an assignment selector."
+  },
+  "PATCH /api/asset-class-config/{code}": {
+    "summary": "Update a portfolio-risk asset-class setting row."
+  },
+  "GET /api/asset-classes": {
+    "summary": "List canonical asset classes for assignment selectors, ETF assignments, target editors, and model packets."
+  },
+  "POST /api/asset-classes": {
+    "summary": "Create a custom fund/ETF allocation class. Requires `display_name` and `quartile`; creates `class_type = CUSTOM` and `analysis_eligible = false`."
+  },
+  "DELETE /api/asset-classes/{code}": {
+    "summary": "Delete an eligible custom asset class."
+  },
+  "GET /api/asset-classes/conflicts": {
+    "summary": "Inspect conflicting asset-class assignments."
+  },
+  "GET /api/asset-classes/trace/{ticker}": {
+    "summary": "Trace assignment evidence for one ticker."
+  },
+  "GET /api/auth/check": {
+    "summary": "Validate the existing API bearer token without DB queries. Authenticated `204`, invalid/missing token `401`, auth-disabled mode `503`. Used by the Council proxy; not a public health check."
+  },
+  "POST /api/cash-movements": {
+    "summary": "Record a user-declared sleeve-cash intent and update displayed asset-class cash."
+  },
+  "GET /api/commodity-themes": {
+    "summary": "Compact market summaries for Markets, Analysis, Positions, and the two source labels in Commodity Connections. Each theme includes a `direct_expression`, direct/equity class-capital values, and non-actionable class reviews. Add `?include_securities=true` when the compact Positions Outperform indicator needs eligible-security states."
+  },
+  "POST /api/commodity-themes": {
+    "summary": "Create a complete direct-commodity and producer-equity market pair. Requires a unique producer asset class, a direct asset class, and both TradingView source configurations. It creates no alerts or directional state."
+  },
+  "DELETE /api/commodity-themes/{code}": {
+    "summary": "Soft-remove a complete market pair from the live Markets and Commodity Connections views. Its configuration and historical evidence remain available in the database."
+  },
+  "GET /api/commodity-themes/{code}": {
+    "summary": "One theme's stages, eligible securities with latest stage evidence, chart-source configuration, direct execution state, and class-capital attribution."
+  },
+  "PATCH /api/commodity-themes/{code}/configuration": {
+    "summary": "Update a market name, group, direct commodity source, or producer-equity pair. The security Outperform denominator follows the configured producer fund. Historical events remain immutable but no longer count if they describe the replaced source; the replacement must be connected and initialised in Alerts."
+  },
+  "PATCH /api/commodity-themes/{code}/direct-expression": {
+    "summary": "Record `SIGNAL_ONLY` or an explicitly approved direct broker instrument. Markets exposes the per-market editor; `APPROVED` requires `instrument_label` or `instrument_ticker`. It never infers a product from a chart symbol, places a trade, or moves class capital."
+  },
+  "POST /api/commodity-themes/initialise-feed": {
+    "summary": "Register a physical, equity-relative, or security Outperform CDF feed and record the operator-selected current `BUY` or `SELL` baseline. The baseline establishes state only; it never projects an alert, action, position, or allocation change."
+  },
+  "POST /api/commodity-themes/price-history/refresh": {
+    "summary": "Refresh cached daily prices for configured direct commodity chart sources. `COMMODITY` stages then expose a price-only `return_60d_pct` and `performance_as_of`; this never changes a confirmation state or action."
+  },
+  "GET /api/council/announcement-router/signals": {
+    "summary": "Read Council announcement-router signals through the authenticated Next proxy."
+  },
+  "GET /api/council/jobs": {
+    "summary": "Read Council jobs through the authenticated Next proxy."
+  },
+  "GET /api/council/portfolio-memos": {
+    "summary": "Read up to 50 saved Intelligence portfolio memo artifacts, with partial-failure reporting. No job submission, import or approval."
+  },
+  "POST /api/council/jobs": {
+    "summary": "Submit Council jobs through the authenticated Next proxy."
+  },
+  "GET /api/council/jobs/{jobId}": {
+    "summary": "Read Council jobs {jobId} through the authenticated Next proxy."
+  },
+  "GET /api/council/jobs/{jobId}/result": {
+    "summary": "Read Council jobs {jobId} result through the authenticated Next proxy."
+  },
+  "GET /api/council/runs": {
+    "summary": "Read Council runs through the authenticated Next proxy."
+  },
+  "GET /api/council/runs/{runId}": {
+    "summary": "Read Council runs {runId} through the authenticated Next proxy."
+  },
+  "GET /api/council/runs/latest": {
+    "summary": "Read Council runs latest through the authenticated Next proxy."
+  },
+  "GET /api/data-freshness": {
+    "summary": "Read-only application freshness ledger. Returns scheduler settings and one status per provider/event family, including last attempt, last success, conservative `data_fresh_through`, coverage, errors, cadence, and stale tolerance. It never starts provider or AI work."
+  },
+  "GET /api/decisions": {
+    "summary": "List user decisions."
+  },
+  "POST /api/decisions": {
+    "summary": "Create a decision for an alert. Single-security executions also accept optional positive `units`, persisted with the security action for statement matching; omit for estimated matching."
+  },
+  "POST /api/enrich/tickers": {
+    "summary": "Enrich ticker mappings."
+  },
+  "GET /api/equity-sizing": {
+    "summary": "Q3/Q4 detector sizing state and recent history."
+  },
+  "GET /api/etf/actual-allocations": {
+    "summary": "Actual ETF allocations."
+  },
+  "GET /api/etf/allocation-ledger": {
+    "summary": "Backend allocation ledger used by the ETF Monitor. Splits each ETF into actual, core target, tactical target, remaining, and status."
+  },
+  "GET /api/etf/allocations": {
+    "summary": "ETF target allocations."
+  },
+  "POST /api/etf/allocations/rebalance": {
+    "summary": "Manual ETF allocation rebalance."
+  },
+  "PUT /api/etf/core-policies/{assetClass}": {
+    "summary": "Select or clear the class Core ETF; update ratio and momentum influence.",
+    "requestBody": {
+      "required": true,
+      "description": "Optional fields preserve existing values. Empty core_ticker clears Core. Non-empty ticker must identify an ETF assigned to this class in Analysis. Numeric values are clamped to 0..100 by the handler, not rejected.",
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "core_ticker": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "core_ratio_pct": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "momentum_influence_pct": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "GET /api/etf/management": {
+    "summary": "Explicit ETF management profiles; funds without a record default to `etf_tms`."
+  },
+  "PUT /api/etf/management/{ticker}": {
+    "summary": "Switch an ETF's management mode, not its classification or allocation model. Requires `mode` and `previous_mode` (`etf_tms` or `tms`), plus `initial_state` (`BUY` or `SELL`). Retires unexecuted old-script actions and requires reconnection in Alerts. Returns 409 for stale mode, unresolved reported execution, or ambiguous exchange symbol.",
+    "requestBody": {
+      "required": true,
+      "description": "Changing mode requires the previous mode to match, an explicit initial direction, no ambiguous exchange symbol and no pending/variance execution. Connections for the old script are cleared; the broker holding is unchanged.",
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "mode": {
+                "type": "string",
+                "enum": [
+                  "tms",
+                  "etf_tms"
+                ]
+              },
+              "previous_mode": {
+                "type": "string",
+                "enum": [
+                  "tms",
+                  "etf_tms"
+                ]
+              },
+              "initial_state": {
+                "type": "string",
+                "enum": [
+                  "BUY",
+                  "SELL"
+                ]
+              }
+            },
+            "required": [
+              "mode",
+              "previous_mode",
+              "initial_state"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "GET /api/etf/mappings": {
+    "summary": "Compatibility readout of ETF asset-class assignments stored on `stock_analysis`."
+  },
+  "PATCH /api/etf/mappings/{ticker}": {
+    "summary": "Assign, change, or clear an ETF asset class on `stock_analysis.primary_asset_class`."
+  },
+  "GET /api/etf/momentum": {
+    "summary": "Internal ETF momentum workspace, including the latest evidence run, published run, calculation/data dates, coverage, rows, and backend automation status."
+  },
+  "POST /api/etf/momentum/price-history/refresh": {
+    "summary": "Manual recovery refresh for cached ETF daily prices. The backend automation owns normal daily collection."
+  },
+  "POST /api/etf/momentum/runs": {
+    "summary": "Calculate and persist a versioned internal ETF momentum run from cached prices. Manual runs do not bypass publication cadence."
+  },
+  "POST /api/etf/momentum/tradingview-snapshots": {
+    "summary": "Persist an external TradingView result for parity comparison. It is not the production target source."
+  },
+  "GET /api/etf/policy": {
+    "summary": "ETF policy readout: minimum ETF exposure and core sleeve ratio."
+  },
+  "GET /api/etf/positions": {
+    "summary": "ETF tactical position states."
+  },
+  "PATCH /api/etf/positions/{ticker}": {
+    "summary": "Update ETF position state."
+  },
+  "GET /api/etf/rebalance": {
+    "summary": "Active ETF rebalance target."
+  },
+  "POST /api/etf/rebalance/{sequence}/dismiss": {
+    "summary": "Dismiss ETF rebalance target."
+  },
+  "GET /api/etf/shortlist": {
+    "summary": "List the ETF shortlist."
+  },
+  "DELETE /api/etf/shortlist/{ticker}": {
+    "summary": "Remove a shortlist entry."
+  },
+  "PUT /api/etf/shortlist/{ticker}": {
+    "summary": "Add or update a shortlist entry."
+  },
+  "GET /api/etf/unmapped-holdings": {
+    "summary": "List ETFs requiring an asset-class mapping."
+  },
+  "GET /api/groups": {
+    "summary": "List stock groups."
+  },
+  "POST /api/groups": {
+    "summary": "Save stock groups and assignments."
+  },
+  "DELETE /api/groups/{id}": {
+    "summary": "Delete stock group."
+  },
+  "GET /api/health": {
+    "summary": "Health check."
+  },
+  "PATCH /api/holdings/{id}": {
+    "summary": "Update holding metadata such as cash reserve."
+  },
+  "GET /api/mappings": {
+    "summary": "List company mappings."
+  },
+  "PATCH /api/mappings/{id}": {
+    "summary": "Update company mapping."
+  },
+  "POST /api/mappings/bulk": {
+    "summary": "Bulk update mappings."
+  },
+  "POST /api/migrate/previous-alerts": {
+    "summary": "Run the legacy previous-alert migration; maintenance only."
+  },
+  "GET /api/news/brief": {
+    "summary": "Return the latest persisted macro news brief, active foundation cohort, latest foundation job, news items, theses, and thesis updates."
+  },
+  "POST /api/news/daily-jobs": {
+    "summary": "Start an asynchronous daily narrative update for the active foundation cohort. Manual operation remains available; the unified backend worker also schedules at most one active/successful run per UTC date after its configured hour."
+  },
+  "GET /api/news/daily-jobs/{id}": {
+    "summary": "Return daily narrative job status, stage, progress, result linkage, and failure details. The frontend polls this only while the job is queued or running."
+  },
+  "POST /api/news/deduplicate": {
+    "summary": "Deduplicate narrative theses."
+  },
+  "POST /api/news/foundation-jobs": {
+    "summary": "Start an async foundation job. Body accepts `{ \"source_memo_job_id\": \"...\" }`. The job extracts memo candidates, builds research lanes, validates with Grok web search, clusters duplicate thesis families, quality-gates the result, and promotes a new active foundation cohort only on success."
+  },
+  "GET /api/news/foundation-jobs/{id}": {
+    "summary": "Return foundation job status, stage, progress, model, quality score, promoted cohort/run IDs, and error message if failed."
+  },
+  "GET /api/news/market-context-history": {
+    "summary": "Read saved market-context history."
+  },
+  "POST /api/news/run": {
+    "summary": "Run the xAI/Grok macro narrative job synchronously. This remains the daily-run path and a compatibility path for bootstrap. Body accepts `{ \"mode\": \"daily\" }`, `{ \"mode\": \"bootstrap\" }`, or `{ \"mode\": \"bootstrap\", \"source_memo_job_id\": \"...\" }`. Requires `XAI_API_KEY`."
+  },
+  "DELETE /api/news/theses/{id}": {
+    "summary": "Delete a narrative thesis."
+  },
+  "GET /api/news/theses/{id}": {
+    "summary": "Read a narrative thesis."
+  },
+  "PATCH /api/news/theses/{id}": {
+    "summary": "Update a narrative thesis."
+  },
+  "GET /api/news/theses/{id}/conviction-history": {
+    "summary": "Read thesis conviction history."
+  },
+  "POST /api/news/theses/{id}/mark-invalidation-checked": {
+    "summary": "Record an invalidation review."
+  },
+  "GET /api/news/theses/{id}/updates": {
+    "summary": "Read thesis updates."
+  },
+  "GET /api/performance/asset-classes": {
+    "summary": "Statement-derived asset-class value and weight series."
+  },
+  "GET /api/performance/events": {
+    "summary": "Chart event stream for signals, decisions, expiries, risk events, and portfolio target events."
+  },
+  "GET /api/performance/portfolio": {
+    "summary": "Statement-derived portfolio value series."
+  },
+  "GET /api/performance/security-directions": {
+    "summary": "Per-security recent movement direction used by UI performance indicators."
+  },
+  "GET /api/performance/security/{ticker}": {
+    "summary": "Statement-derived security price, units, and value series."
+  },
+  "GET /api/portfolio": {
+    "summary": "Portfolio summary."
+  },
+  "GET /api/portfolio-history": {
+    "summary": "Read the combined shape, memo and target timeline."
+  },
+  "POST /api/portfolio-memos": {
+    "summary": "Save a portfolio memo in the Terminal."
+  },
+  "GET /api/portfolio-memos/{jobId}": {
+    "summary": "Read a locally saved memo by job ID."
+  },
+  "GET /api/portfolio-memos/latest": {
+    "summary": "Read the latest locally saved portfolio memo."
+  },
+  "POST /api/portfolio-mix/approve-current": {
+    "summary": "Approve current mix as baseline."
+  },
+  "GET /api/portfolio-mix/approved": {
+    "summary": "Latest approved portfolio mix."
+  },
+  "GET /api/portfolio-mix/current": {
+    "summary": "Current asset-class mix from live holdings."
+  },
+  "GET /api/portfolio-mix/cycle-performance": {
+    "summary": "Opening-basket adjusted-price returns for an approved portfolio cycle."
+  },
+  "GET /api/portfolio-overlay-summary": {
+    "summary": "Current Q3/Q4 overlay summary and latest workflow event."
+  },
+  "POST /api/portfolio-overlay/apply-stage1": {
+    "summary": "Confirm recorded Stage 1 reductions."
+  },
+  "POST /api/portfolio-overlay/complete-stage2": {
+    "summary": "Complete Stage 2 after reserve handling."
+  },
+  "POST /api/portfolio-overlay/mark-reviewed": {
+    "summary": "Close a no-forced-trade Q3 signal after user review."
+  },
+  "POST /api/portfolio-overlay/mark-stage1-partial": {
+    "summary": "Save partial Stage 1 progress."
+  },
+  "GET /api/portfolio-overlay/reconciliation": {
+    "summary": "Statement reconciliation for active overlay event."
+  },
+  "POST /api/portfolio-overlay/reopen-stage1": {
+    "summary": "Reopen Stage 1 action fields."
+  },
+  "POST /api/portfolio-overlay/save-stage2": {
+    "summary": "Save Stage 2 target rows."
+  },
+  "POST /api/portfolio-overlay/set-baseline": {
+    "summary": "Accept overlay workflow into baseline/completed state."
+  },
+  "POST /api/portfolio-overlay/sync": {
+    "summary": "Explicitly synchronise overlay signal state and events."
+  },
+  "POST /api/portfolio-rebalances": {
+    "summary": "Create manual portfolio rebalance plan."
+  },
+  "GET /api/portfolio-rebalances/{id}/adjustment-plan": {
+    "summary": "Specific rebalance adjustment plan."
+  },
+  "POST /api/portfolio-rebalances/{id}/approve": {
+    "summary": "Approve completed target as baseline."
+  },
+  "POST /api/portfolio-rebalances/{id}/complete": {
+    "summary": "Confirm position actions for target."
+  },
+  "POST /api/portfolio-rebalances/{id}/mark-partial": {
+    "summary": "Persist partial recorded moves."
+  },
+  "GET /api/portfolio-rebalances/current": {
+    "summary": "Current portfolio rebalance plan."
+  },
+  "GET /api/portfolio-rebalances/current/adjustment-plan": {
+    "summary": "Current rebalance adjustment plan."
+  },
+  "POST /api/portfolio-rebalances/from-memo": {
+    "summary": "Create rebalance from AI memo."
+  },
+  "GET /api/portfolio-risk/header-state": {
+    "summary": "Header pullout readout for Q3, Q4, and approved portfolio mix."
+  },
+  "GET /api/portfolio/mandate": {
+    "summary": "Read the portfolio mandate projection."
+  },
+  "GET /api/positions": {
+    "summary": "Security position states."
+  },
+  "PATCH /api/positions/{ticker}": {
+    "summary": "Update security position state or manual override."
+  },
+  "GET /api/regime-assignments": {
+    "summary": "Legacy assignment list. Regimes tab is currently unmounted."
+  },
+  "POST /api/regime/apply-impacts": {
+    "summary": "Apply explicit regime impacts."
+  },
+  "GET /api/regime/proposed-actions": {
+    "summary": "Read proposed regime impacts."
+  },
+  "GET /api/regimes": {
+    "summary": "Raw generic regime state."
+  },
+  "GET /api/regimes/returns": {
+    "summary": "Latest persisted legacy regime return snapshot. This read never calls Yahoo. Before the first refresh it returns `[]` with `X-Data-Freshness-Status: NEVER_RUN`."
+  },
+  "POST /api/regimes/returns/refresh": {
+    "summary": "Manual recovery refresh for the persisted legacy regime return snapshot. Normal collection belongs to the unified backend worker."
+  },
+  "GET /api/regimes/status": {
+    "summary": "Computed generic regime status."
+  },
+  "GET /api/security-actions": {
+    "summary": "List projected security/class actions for Alert Stack and Positions. Optional `ticker` filters one security; `includeHistory=true` includes terminal records for Decision History and individual alert detail."
+  },
+  "POST /api/security-actions/{id}/ignore": {
+    "summary": "Ignore a non-Exit primary action. Exit actions reject this request."
+  },
+  "POST /api/security-actions/{id}/override-exit": {
+    "summary": "Record an explicit Exit override with required `reason` and optional RFC3339 `next_review_at`; the Exit remains unresolved.",
+    "requestBody": {
+      "required": true,
+      "description": "Reason must remain non-empty after trimming. Optional next_review_at may be empty or RFC3339. The Exit remains unresolved.",
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "reason": {
+                "type": "string",
+                "pattern": "\\S"
+              },
+              "next_review_at": {
+                "anyOf": [
+                  {
+                    "const": ""
+                  },
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "reason"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "POST /api/security-actions/{id}/record-execution": {
+    "summary": "Body: `{ \"notes\": \"optional\", \"units\": 10 }`; `units` is optional, positive, and security-scoped (not one amount for a whole class). IG deployments require a funded class-pool ticket and await statement quantity matching. External executions complete manually without IG verification.",
+    "requestBody": {
+      "required": true,
+      "description": "Record only a trade already executed. Optional units support quantity matching. Normal IG purchases require a funded ticket. Purchase exceptions require positive units, positive cash_value and nonblank exception_reason together, plus backend eligibility. Class actions cannot use security-unit input. Schema alone cannot validate these workflow permissions.",
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "notes": {
+                "type": "string"
+              },
+              "units": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "exclusiveMinimum": 0
+              },
+              "cash_value": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "exclusiveMinimum": 0
+              },
+              "exception_reason": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "GET /api/settings": {
+    "summary": "App settings."
+  },
+  "POST /api/settings": {
+    "summary": "Update settings."
+  },
+  "POST /api/sizing/allocations": {
+    "summary": "Runtime stock-sizing calculation for Analysis Target Weight. Accepts stock evidence, portfolio value, optional announcement-router scores, and `class_budgets[].class_budget`. The backend deducts each class's effective Core ETF ratio before returning anchored `allocation_dollar`; `class_budget_source` identifies the applied authority."
+  },
+  "GET /api/statements": {
+    "summary": "List statements."
+  },
+  "GET /api/statements/{id}": {
+    "summary": "Statement detail."
+  },
+  "POST /api/statements/import": {
+    "summary": "Validate and import a complete current snapshot of the established broker account; older dates and external-position conflicts are rejected."
+  },
+  "GET /api/statements/latest": {
+    "summary": "Latest statement with holdings."
+  },
+  "GET /api/sync/changes": {
+    "summary": "Pending sync changes."
+  },
+  "POST /api/sync/changes/acknowledge": {
+    "summary": "Acknowledge sync changes."
+  },
+  "GET /api/sync/history": {
+    "summary": "Sync history."
+  },
+  "POST /api/sync/tradingview": {
+    "summary": "Manual TradingView sync."
+  },
+  "GET /api/webhook-dead-letters": {
+    "summary": "Inspect failed webhook processing receipts."
+  },
+  "POST /api/webhook-dead-letters/{id}/dismiss": {
+    "summary": "Dismiss a failed webhook receipt."
+  },
+  "POST /api/webhook-dead-letters/{id}/retry": {
+    "summary": "Explicitly retry a failed webhook receipt."
+  },
+  "POST /api/webhook/etf-rebalance": {
+    "summary": "ETF momentum rebalance targets."
+  },
+  "POST /api/webhook/regime": {
+    "summary": "Generic regime, Q3 detector, and Q4 detector signals."
+  },
+  "POST /api/webhook/theme-confirmation": {
+    "summary": "Ingest a validated `BUY` or `SELL` class or security-relative CDF event for an already registered feed. `CONNECT` is ignored and never changes market state. `EQUITY_RELATIVE BUY -> SELL` projects one class Strong Trim; security Outperform transitions create visible confirmation/loss alerts, while per-security sizing remains pending."
+  },
+  "GET /api/webhook/tradingview": {
+    "summary": "HTML webhook status/debug view."
+  },
+  "POST /api/webhook/tradingview": {
+    "summary": "Per-security CDF/TMS/price-target signals."
+  }
+}

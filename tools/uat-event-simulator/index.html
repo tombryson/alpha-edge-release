@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Alpha Edge UAT Event Simulator</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --canvas: #080a0d;
+      --surface: #0d1118;
+      --surface-strong: #101722;
+      --line: #26313d;
+      --line-soft: #1a222c;
+      --text: #d4dbe6;
+      --muted: #8490a0;
+      --cyan: #72d7ee;
+      --green: #38d878;
+      --amber: #f2b64b;
+      --red: #ff626d;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-width: 980px;
+      background: var(--canvas);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 14px;
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { cursor: not-allowed; opacity: .45; }
+    .shell { width: min(1440px, calc(100vw - 48px)); margin: 0 auto; padding: 30px 0 60px; }
+    .topline { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 18px; }
+    h1 { margin: 0; font-size: 20px; letter-spacing: .12em; font-weight: 700; }
+    .subtitle { margin: 7px 0 0; color: var(--muted); font-size: 13px; }
+    .tag { border: 1px solid color-mix(in srgb, var(--amber) 45%, transparent); color: #ffd279; padding: 5px 8px; font-size: 11px; font-weight: 700; letter-spacing: .08em; }
+    .config { display: grid; grid-template-columns: minmax(330px, 1fr) minmax(260px, .8fr) auto; gap: 12px; align-items: end; padding: 18px 0; border-bottom: 1px solid var(--line-soft); }
+    label { display: grid; gap: 7px; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .11em; }
+    input, select { width: 100%; height: 34px; border: 1px solid var(--line); border-radius: 3px; background: var(--surface); color: var(--text); padding: 0 10px; outline: none; }
+    input:focus, select:focus { border-color: color-mix(in srgb, var(--cyan) 65%, var(--line)); }
+    .button { height: 34px; border: 1px solid var(--line); border-radius: 3px; background: var(--surface); color: var(--text); padding: 0 12px; font-size: 12px; font-weight: 650; transition: background .16s, border-color .16s; }
+    .button:hover:not(:disabled) { background: var(--surface-strong); border-color: #42566a; }
+    .button-primary { border-color: color-mix(in srgb, var(--cyan) 50%, var(--line)); color: #c8f6ff; background: color-mix(in srgb, var(--cyan) 9%, var(--surface)); }
+    .button-next { border-color: color-mix(in srgb, var(--green) 50%, var(--line)); color: #c2f5d1; background: color-mix(in srgb, var(--green) 8%, var(--surface)); }
+    .meta { display: flex; gap: 18px; min-height: 53px; align-items: center; color: var(--muted); font-size: 12px; }
+    .meta strong { color: var(--text); font-weight: 650; }
+    .warning { color: #ffd279; }
+    .error { color: #ff9aa2; }
+    .grid { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 22px; margin-top: 8px; }
+    .panel { border: 1px solid var(--line); border-radius: 4px; background: linear-gradient(180deg, #0e141d 0%, #0b1016 100%); }
+    .panel-header { display: flex; justify-content: space-between; align-items: center; min-height: 48px; padding: 0 14px; border-bottom: 1px solid var(--line-soft); }
+    .panel-heading { font-size: 12px; font-weight: 750; letter-spacing: .11em; }
+    .progress { color: var(--muted); font-size: 12px; }
+    .steps { min-width: 0; }
+    .step { display: grid; grid-template-columns: 35px minmax(190px, 1fr) minmax(200px, 1.05fr) minmax(200px, 1.05fr) 110px; gap: 12px; align-items: center; min-height: 72px; padding: 9px 14px; border-bottom: 1px solid var(--line-soft); }
+    .step:last-child { border-bottom: 0; }
+    .step.pending { opacity: .48; }
+    .step.active { background: color-mix(in srgb, var(--cyan) 5%, transparent); }
+    .number { color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; }
+    .step-title { font-weight: 650; }
+    .step-detail { margin-top: 4px; color: var(--muted); font-size: 11px; line-height: 1.35; }
+    .eyebrow { color: var(--muted); font-size: 9px; font-weight: 750; letter-spacing: .1em; }
+    .outcome { margin-top: 5px; font-size: 12px; line-height: 1.35; }
+    .state { display: inline-flex; align-items: center; min-height: 23px; border: 1px solid var(--line); border-radius: 3px; padding: 0 7px; font-size: 10px; font-weight: 700; letter-spacing: .04em; }
+    .state.pending { color: var(--muted); }
+    .state.match { border-color: color-mix(in srgb, var(--green) 45%, var(--line)); color: #9debb8; background: color-mix(in srgb, var(--green) 7%, transparent); }
+    .state.mismatch, .state.error { border-color: color-mix(in srgb, var(--red) 48%, var(--line)); color: #ffadb3; background: color-mix(in srgb, var(--red) 8%, transparent); }
+    .review { display: grid; justify-items: end; gap: 5px; }
+    .review button { width: 74px; height: 25px; border: 1px solid var(--line); border-radius: 3px; background: transparent; color: var(--muted); font-size: 10px; }
+    .review button.pass { border-color: color-mix(in srgb, var(--green) 40%, var(--line)); color: #9debb8; }
+    .review button.fail { border-color: color-mix(in srgb, var(--red) 40%, var(--line)); color: #ffadb3; }
+    .side { padding: 14px; }
+    .side-block { padding-bottom: 15px; margin-bottom: 15px; border-bottom: 1px solid var(--line-soft); }
+    .side-block:last-child { padding-bottom: 0; margin-bottom: 0; border-bottom: 0; }
+    .side-title { color: var(--muted); font-size: 10px; font-weight: 750; letter-spacing: .11em; }
+    .side-value { margin-top: 7px; font-size: 13px; line-height: 1.55; }
+    .fixture { color: var(--cyan); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .log { min-height: 230px; max-height: 390px; overflow: auto; margin: 0; color: #a9b5c4; font: 11px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; }
+    .empty { padding: 38px 16px; color: var(--muted); text-align: center; }
+    @media (max-width: 1050px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="topline">
+      <div>
+        <h1>UAT EVENT SIMULATOR</h1>
+        <p class="subtitle">Independent operator runner. Replays fixed signal sequences against UAT, one event at a time.</p>
+      </div>
+      <div class="tag">UAT ONLY</div>
+    </div>
+
+    <section class="config" aria-label="Runner configuration">
+      <label>UAT API BASE URL
+        <input id="api-base" data-testid="api-base" value="https://alpha-edge-uat-backend.fly.dev/api" autocomplete="off" spellcheck="false">
+      </label>
+      <label>UAT API TOKEN
+        <input id="api-token" data-testid="api-token" type="password" autocomplete="off" spellcheck="false" placeholder="Bearer token, stored for this session only">
+      </label>
+      <button id="connect" class="button" type="button">Check connection</button>
+    </section>
+
+    <div class="meta" id="status-line">
+      <span>Fixture: <strong class="fixture">ASX:AEVT</strong></span>
+      <span>Seeds a real mock Gold Miner, then uses the normal signal, alert, position, and market endpoints.</span>
+      <span class="warning">No production routes or UI are involved.</span>
+    </div>
+
+    <section class="config" aria-label="Scenario controls">
+      <label>SCENARIO
+        <select id="scenario" data-testid="scenario"></select>
+      </label>
+      <div id="scenario-description" class="meta">Choose a fixed scenario, then prepare the reserved fixture.</div>
+      <div style="display:flex; gap:8px; justify-content:flex-end">
+        <button id="start" data-testid="start" class="button button-primary" type="button">Start clean</button>
+        <button id="next" data-testid="next" class="button button-next" type="button" disabled>Next event</button>
+      </div>
+    </section>
+
+    <div class="grid">
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-heading">EVENT LEDGER</div>
+          <div id="progress" class="progress">No run active</div>
+        </div>
+        <div id="steps" class="steps"><div class="empty">Start a clean run to prepare the fixture and event ledger.</div></div>
+      </section>
+      <aside class="panel side">
+        <div class="side-block">
+          <div class="side-title">HOW TO USE</div>
+          <div class="side-value">Keep the Alpha Edge UAT Positions and Alerts tabs open beside this runner. Refresh Positions after Start clean to see the simulated 100-unit holding.</div>
+        </div>
+        <div class="side-block">
+          <div class="side-title">FIXTURE BOUNDARY</div>
+          <div class="side-value">Only <span class="fixture">ASX:AEVT</span> is created, reset, or dismissed. It is a Gold Miner fixture using $500 of current UAT cash and writes the matching holding, statement, and stable identity.</div>
+        </div>
+        <div class="side-block">
+          <div class="side-title">ACTUAL SYSTEM PATH</div>
+          <div class="side-value">Stock events use the normal TradingView webhook. Commodity-ratio events use market confirmation and verify the persisted Market evidence afterwards.</div>
+        </div>
+        <div class="side-block">
+          <div class="side-title">RUN LOG</div>
+          <pre id="log" class="log">Ready.</pre>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const FIXTURE = {
+        ticker: 'ASX:AEVT',
+        symbol: 'AEVT',
+        name: 'UAT Event Simulator',
+      };
+      const TOKEN_KEY = 'alpha-edge-uat-event-simulator-token';
+      const API_KEY = 'alpha-edge-uat-event-simulator-api-base';
+      const $ = (selector) => document.querySelector(selector);
+      const apiBaseInput = $('#api-base');
+      const tokenInput = $('#api-token');
+      const scenarioSelect = $('#scenario');
+      const statusLine = $('#status-line');
+      const stepsElement = $('#steps');
+      const logElement = $('#log');
+      const progressElement = $('#progress');
+      const startButton = $('#start');
+      const nextButton = $('#next');
+
+      const scenarios = [
+        {
+          key: 'stock_alert_catalogue',
+          title: 'Stock alert catalogue',
+          description: 'Every current stock-level CDF/TMS outcome: state-only trend events, Breakout, strong and weak adds/trims, sell-down, partial stop, re-entry, and the legacy full stop.',
+          steps: [
+            step('Connect CDF in Buy', 'Registers CDF and synchronises the initial Buy state. It must not create a work card.', { ticker: FIXTURE.ticker, signal: 'connect', script: 'cdf', current_zone: 'BUY' }, 'No Alert Stack card. Security state is Buy.', null, 'BUY'),
+            step('Enable TMS', 'Registers the TMS setup. Connection state is not an action.', { ticker: FIXTURE.ticker, signal: 'connect', script: 'tms' }, 'No Alert Stack card. TMS becomes connected.', null, 'BUY'),
+            step('Breakout', 'A CDF buy-zone event from the trade-management script creates the 30-day Breakout action.', { ticker: FIXTURE.ticker, signal: 'breakout', script: 'tms', price: 12.66 }, 'One Breakout card with a 30-day validity window.', 'BREAKOUT', 'BUY'),
+            step('Weak add', 'A valid weak TMS add creates a time-bounded position action.', { ticker: FIXTURE.ticker, signal: 'weak_add', script: 'tms', timeframe: '1D', price: 12.72 }, 'One Add card retaining Weak and 1D metadata.', 'ADD', 'BUY', 'Weak', '1D'),
+            step('Strong add', 'A valid strong TMS add creates a time-bounded position action.', { ticker: FIXTURE.ticker, signal: 'strong_add', script: 'tms', timeframe: '3D', price: 12.94 }, 'One Add card retaining Strong and 3D metadata.', 'ADD', 'BUY', 'Strong', '3D'),
+            step('Weak trim', 'A weak tactical trim remains distinct from a stop or sell-down.', { ticker: FIXTURE.ticker, signal: 'weak_trim', script: 'tms', timeframe: '1D', price: 12.51 }, 'One Trim card retaining Weak and 1D metadata.', 'TRIM', 'BUY', 'Weak', '1D'),
+            step('Strong trim', 'A strong tactical trim remains distinct from a stop or sell-down.', { ticker: FIXTURE.ticker, signal: 'strong_trim', script: 'tms', timeframe: '2D', price: 12.29 }, 'One Trim card retaining Strong and 2D metadata.', 'TRIM', 'BUY', 'Strong', '2D'),
+            step('CDF sell-down zone', 'The embedded CDF negative zone creates the partial sell-down action.', { ticker: FIXTURE.ticker, signal: 'cdf_sell_zone', script: 'tms', price: 11.76 }, 'One Sell Down 20% card.', 'SELL_DOWN', 'BUY'),
+            step('TMS stop while CDF is Buy', 'A stop in constructive CDF context creates a partial stop and waiting-for-re-entry state.', { ticker: FIXTURE.ticker, signal: 'sell', script: 'tms', cdf_state: 'BUY', price: 11.35 }, 'One Sell Down 50% card and waiting-for-re-entry state.', 'SELL_50', 'SELL'),
+            step('TMS re-entry', 'A re-entry is valid only after the earlier partial stop created the waiting state.', { ticker: FIXTURE.ticker, signal: 'reentry', script: 'tms', price: 11.92 }, 'One Re-entry card and Buy state.', 'REENTRY', 'BUY'),
+            step('CDF Sell state', 'Plain CDF Sell changes state only. It must not manufacture an alert action.', { ticker: FIXTURE.ticker, signal: 'sell', script: 'cdf' }, 'No new Alert Stack card. Security state is Sell.', null, 'SELL'),
+            step('TMS stop while CDF is Sell', 'Current full-stop behaviour. This exposes the legacy raw SELL before the Exit-gate migration.', { ticker: FIXTURE.ticker, signal: 'sell', script: 'tms', cdf_state: 'SELL', price: 10.88 }, 'One full-stop card using the legacy SELL code.', 'SELL', 'SELL'),
+          ],
+        },
+        {
+          key: 'routing_guardrails',
+          title: 'Routing guardrails',
+          description: 'Proves that an arbitrary TMS event is rejected until the expected setup exists, then admitted through the normal signal path.',
+          steps: [
+            step('TMS add without setup', 'The event is suppressed because no TMS connection exists.', { ticker: FIXTURE.ticker, signal: 'strong_add', script: 'tms', timeframe: '1D' }, 'No Alert Stack card. Event is suppressed for missing TMS setup.', null, null),
+            step('Connect CDF in Buy', 'Creates connection and state context only.', { ticker: FIXTURE.ticker, signal: 'connect', script: 'cdf', current_zone: 'BUY' }, 'No Alert Stack card. Security state is Buy.', null, 'BUY'),
+            step('Connect TMS', 'Permits TMS position events for the fixture.', { ticker: FIXTURE.ticker, signal: 'connect', script: 'tms' }, 'No Alert Stack card. TMS becomes connected.', null, 'BUY'),
+            step('TMS add after setup', 'The same event is now admitted through the normal signal path and receives one class-pool ticket. Strong is evidence, not a larger dollar order.', { ticker: FIXTURE.ticker, signal: 'strong_add', script: 'tms', timeframe: '1D' }, 'One Add card with Strong and 1D metadata, plus a funded $100 class-pool ticket.', 'ADD', 'BUY', 'Strong', '1D', { state: 'FUNDED', ticket: 100 }),
+          ],
+        },
+        {
+          key: 'commodity_ratio_transport',
+          title: 'Commodity ratio transport',
+          description: 'Verifies TradingView-native BATS ETF routing and ASX_DLY daily-feed symbols through the real commodity confirmation endpoint, including the visible Outperform transition alerts. The per-security 75/100 capacity action is not built yet.',
+          steps: [
+            themeStep('Gold equities turn bullish', 'CDF on the GDX / GLD chart sends TradingView BATS symbols. The backend must canonicalise them against the configured AMEX ratio.', {
+              event_id: 'uat-event-simulator:gold-equity-relative-buy', theme: 'GOLD', stage: 'EQUITY_RELATIVE', scope: 'THEME', signal: 'BUY', script: 'cdf', signal_version: 'cdf.relative.v1',
+              source: { kind: 'RELATIVE_STRENGTH', numerator: 'BATS:GDX', denominator: 'BATS:GLD', label: 'Gold equities / gold' }, timeframe: '1D', bar_closed_at: '2099-01-10T06:00:00Z', close: 1.12,
+            }, 'Gold equities are bullish. The stored source remains BATS:GDX / BATS:GLD.', 'EQUITY_RELATIVE', 'BUY'),
+            themeStep('AEVT outperforms gold equities', 'CDF on the AEVT / GDX chart sends ASX_DLY:AEVT and BATS:GDX. Both must resolve to the fixture identity and configured Gold core fund.', {
+              event_id: 'uat-event-simulator:gold-aevt-outperform-buy', theme: 'GOLD', stage: 'SECURITY_OUTPERFORM', scope: 'SECURITY', signal: 'BUY', script: 'cdf', signal_version: 'cdf.relative.v1', security: { ticker: 'ASX_DLY:AEVT' },
+              source: { kind: 'RELATIVE_STRENGTH', numerator: 'ASX_DLY:AEVT', denominator: 'BATS:GDX', label: 'AEVT / Gold equities' }, timeframe: '1D', bar_closed_at: '2099-01-10T06:00:00Z', close: 0.94,
+            }, 'AEVT is outperforming gold equities and appears in Alert Stack. No buy or sizing action is created.', 'SECURITY_OUTPERFORM', 'BUY', true, null, 'OUTPERFORM_CONFIRMED'),
+            themeStep('AEVT underperforms gold equities', 'The same relative CDF changes to Sell. The event must be visible as Blocked evidence without pretending the unfinished 75% cap action exists.', {
+              event_id: 'uat-event-simulator:gold-aevt-outperform-sell', theme: 'GOLD', stage: 'SECURITY_OUTPERFORM', scope: 'SECURITY', signal: 'SELL', script: 'cdf', signal_version: 'cdf.relative.v1', security: { ticker: 'ASX_DLY:AEVT' },
+              source: { kind: 'RELATIVE_STRENGTH', numerator: 'ASX_DLY:AEVT', denominator: 'BATS:GDX', label: 'AEVT / Gold equities' }, timeframe: '1D', bar_closed_at: '2099-01-11T06:00:00Z', close: 0.87,
+            }, 'AEVT is underperforming gold equities and the change is visible in Alert Stack. No automatic reduction is asserted until the live-cap projection exists.', 'SECURITY_OUTPERFORM', 'SELL', true, null, 'OUTPERFORM_LOST'),
+            themeStep('Gold equities turn bearish', 'The Gold equity CDF changes from Buy to Sell while the AEVT Gold Miner holding is live. This is the class-level event: it must create one Equity Regime Strong Trim action that includes AEVT.', {
+              event_id: 'uat-event-simulator:gold-equity-relative-sell', theme: 'GOLD', stage: 'EQUITY_RELATIVE', scope: 'THEME', signal: 'SELL', script: 'cdf', signal_version: 'cdf.relative.v1',
+              source: { kind: 'RELATIVE_STRENGTH', numerator: 'BATS:GDX', denominator: 'BATS:GLD', label: 'Gold equities / gold' }, timeframe: '1D', bar_closed_at: '2099-01-12T06:00:00Z', close: 0.91,
+            }, 'Gold equities are bearish and one class-scoped Strong Trim action includes AEVT.', 'EQUITY_RELATIVE', 'SELL', false, {
+              alertType: 'EQUITY_REGIME_STRONG_TRIM', sourceEventKey: 'GOLD:uat-event-simulator:gold-equity-relative-sell', affectedTicker: FIXTURE.symbol,
+            }),
+          ],
+        },
+      ];
+
+      function step(title, description, payload, summary, alertType, positionState, strength = '', timeframe = '', action = null) {
+        return { title, description, payload, expected: { summary, alertType, positionState, strength, timeframe, action } };
+      }
+
+      function themeStep(title, description, payload, summary, stage, signal, securityScoped = false, action = null, alertType = null) {
+        return { title, description, endpoint: '/webhook/theme-confirmation', payload, expected: { summary, theme: { stage, signal, securityScoped, action, alertType } } };
+      }
+
+      let run = null;
+      let busy = false;
+
+      apiBaseInput.value = sessionStorage.getItem(API_KEY) || apiBaseInput.value;
+      tokenInput.value = sessionStorage.getItem(TOKEN_KEY) || '';
+
+      function apiBase() {
+        return apiBaseInput.value.trim().replace(/\/$/, '');
+      }
+
+      function assertUatTarget() {
+        let target;
+        try { target = new URL(apiBase()); } catch { throw new Error('Enter a valid UAT API URL.'); }
+        const allowed = target.hostname === 'alpha-edge-uat-backend.fly.dev' || target.hostname === 'localhost' || target.hostname === '127.0.0.1';
+        if (!allowed) throw new Error('This runner is restricted to the UAT backend or local development.');
+      }
+
+      function token() { return tokenInput.value.trim(); }
+
+      async function request(path, options = {}) {
+        assertUatTarget();
+        if (!token()) throw new Error('Enter the UAT API token first.');
+        const headers = new Headers(options.headers || {});
+        headers.set('Authorization', `Bearer ${token()}`);
+        if (options.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
+        const response = await fetch(`${apiBase()}${path}`, { ...options, headers });
+        const text = await response.text();
+        let body = null;
+        try { body = text ? JSON.parse(text) : null; } catch { body = text; }
+        if (!response.ok) {
+          const detail = typeof body === 'string' ? body : body && (body.message || body.error);
+          throw new Error(`${options.method || 'GET'} ${path} failed (${response.status})${detail ? `: ${detail}` : ''}`);
+        }
+        return body;
+      }
+
+      function log(message) {
+        const now = new Date().toLocaleTimeString([], { hour12: false });
+        logElement.textContent = `[${now}] ${message}\n${logElement.textContent}`.trim();
+      }
+
+      function setStatus(message, type = '') {
+        statusLine.innerHTML = `<span>Fixture: <strong class="fixture">${FIXTURE.ticker}</strong></span><span class="${type}">${escapeHtml(message)}</span>`;
+      }
+
+      function selectedScenario() {
+        return scenarios.find((scenario) => scenario.key === scenarioSelect.value) || scenarios[0];
+      }
+
+      function alertMatchesFixture(alert) {
+        const ticker = String(alert.ticker || '').toUpperCase();
+        const prefix = String(alert.exchange_prefix || '').toUpperCase();
+        return ticker === FIXTURE.symbol && (!prefix || prefix === 'ASX:');
+      }
+
+      async function getAlerts() {
+        const alerts = await request('/alerts?includeHistory=true');
+        return Array.isArray(alerts) ? alerts : [];
+      }
+
+      async function getFixturePosition() {
+        const positions = await request('/positions');
+        return (Array.isArray(positions) ? positions : []).find((position) => String(position.ticker || '').toUpperCase() === FIXTURE.symbol) || null;
+      }
+
+      async function getGoldTheme() {
+        return request('/commodity-themes/GOLD');
+      }
+
+      async function getSecurityActions() {
+        const actions = await request('/security-actions?includeHistory=true');
+        return Array.isArray(actions) ? actions : [];
+      }
+
+      async function pause(milliseconds) {
+        return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+      }
+
+      async function waitForObservation(baselineAlertIDs, expected) {
+        if (expected.theme) return waitForThemeObservation(expected.theme);
+        const deadline = Date.now() + 7000;
+        const quietPeriodEndsAt = Date.now() + 1000;
+        let last = { alert: null, position: null, action: null };
+        while (Date.now() < deadline) {
+          const [alerts, position, actions] = await Promise.all([
+            getAlerts(),
+            getFixturePosition(),
+            expected.action ? getSecurityActions() : Promise.resolve([]),
+          ]);
+          const newFixtureAlerts = alerts.filter((alert) => alertMatchesFixture(alert) && !baselineAlertIDs.has(alert.id));
+          const alert = expected.alertType
+            ? newFixtureAlerts.find((candidate) =>
+              String(candidate.alert_type || '').toUpperCase() === expected.alertType &&
+              (!expected.strength || String(candidate.strength || '') === expected.strength) &&
+              (!expected.timeframe || String(candidate.timeframe || '') === expected.timeframe)
+            )
+            : null;
+          const action = expected.action && alert
+            ? actions.find((candidate) =>
+              Number(candidate.alert_id) === Number(alert.id) &&
+              String(candidate.deployment_state || '') === expected.action.state &&
+              (!expected.action.ticket || Number(candidate.instruction_value || 0) === expected.action.ticket)
+            )
+            : null;
+          last = { alert, position, action };
+          const cardMatches = expected.alertType ? Boolean(alert) : newFixtureAlerts.length === 0;
+          const stateMatches = !expected.positionState || position?.position_state === expected.positionState;
+          const actionMatches = !expected.action || Boolean(action);
+          // Webhook handlers acknowledge before their actual processing runs.
+          // A silent expected result needs a short quiet period, otherwise the
+          // runner could declare success before a wrongly-created card arrives.
+          const quietEnough = expected.alertType || Date.now() >= quietPeriodEndsAt;
+          if (cardMatches && stateMatches && actionMatches && quietEnough) return { ...last, match: true };
+          await pause(350);
+        }
+        return { ...last, match: false };
+      }
+
+      async function waitForThemeObservation(expected) {
+        const deadline = Date.now() + 7000;
+        let theme = null;
+        while (Date.now() < deadline) {
+          const [nextTheme, actions, alerts] = await Promise.all([getGoldTheme(), getSecurityActions(), getAlerts()]);
+          theme = nextTheme;
+          const stage = (theme.stages || []).find((candidate) => candidate.key === expected.stage);
+          const security = expected.securityScoped
+            ? (theme.eligible_securities || []).find((candidate) => String(candidate.ticker || '').toUpperCase() === FIXTURE.ticker)
+            : null;
+          const signal = expected.securityScoped
+            ? security?.latest_events?.[expected.stage]?.signal
+            : stage?.signal;
+          const action = expected.action
+            ? actions.find((candidate) =>
+              String(candidate.alert_type || '').toUpperCase() === expected.action.alertType &&
+              String(candidate.source_event_key || '') === expected.action.sourceEventKey &&
+              (candidate.affected_tickers || []).map((ticker) => String(ticker).toUpperCase()).includes(expected.action.affectedTicker)
+            )
+            : null;
+          const alert = expected.alertType
+            ? alerts.find((candidate) =>
+              alertMatchesFixture(candidate) &&
+              String(candidate.alert_type || '').toUpperCase() === expected.alertType
+            )
+            : null;
+          if (signal === expected.signal && (!expected.action || action) && (!expected.alertType || alert)) return { theme, stage, security, action, alert, match: true };
+          await pause(350);
+        }
+        return { theme, match: false };
+      }
+
+      async function prepareFixture() {
+        setBusy(true);
+        try {
+          setStatus('Preparing the isolated UAT holding and statement fixture...');
+          await request('/alerts?includeHistory=true');
+          const fixtureResponse = await fetch('/fixture/prepare', { method: 'POST' });
+          const fixtureBody = await fixtureResponse.json();
+          if (!fixtureResponse.ok) throw new Error(fixtureBody.error || 'Unable to prepare the UAT holding fixture.');
+          const scenario = selectedScenario();
+          run = {
+            scenario,
+            index: 0,
+            steps: scenario.steps.map((definition) => ({ definition, status: 'PENDING', observed: null, review: null })),
+          };
+          render();
+          setStatus(`Fixture ready: 100 ${FIXTURE.symbol} at $5.00 ($500) is now in Positions. Reload UAT Positions, then run ${scenario.steps.length} events.`, 'warning');
+          log(`Prepared live mock holding ${FIXTURE.ticker}; statement ${fixtureBody.statement.id} cash was reduced by $500.`);
+        } catch (error) {
+          setStatus(error.message || 'Unable to prepare fixture.', 'error');
+          log(`ERROR: ${error.message || error}`);
+        } finally {
+          setBusy(false);
+        }
+      }
+
+      async function deliverNext() {
+        if (!run || busy || run.index >= run.steps.length) return;
+        setBusy(true);
+        const current = run.steps[run.index];
+        try {
+          setStatus(`Delivering ${current.definition.title} through the normal webhook...`);
+          const alerts = await getAlerts();
+          const baselineAlertIDs = new Set(alerts.filter(alertMatchesFixture).map((alert) => alert.id));
+          await request(current.definition.endpoint || '/webhook/tradingview', {
+            method: 'POST',
+            body: JSON.stringify(current.definition.payload),
+          });
+          const observed = await waitForObservation(baselineAlertIDs, current.definition.expected);
+          current.observed = observed;
+          current.status = observed.match ? 'MATCH' : 'MISMATCH';
+          run.index += 1;
+          setStatus(observed.match ? `${current.definition.title} matched the persisted UAT result.` : `${current.definition.title} needs review.`, observed.match ? '' : 'error');
+          log(`${current.status}: ${current.definition.title}${observed.alert ? ` -> ${observed.alert.alert_type}` : observed.action ? ` -> ${observed.action.alert_type}` : observed.theme ? ` -> ${current.definition.expected.theme.stage} ${current.definition.expected.theme.signal}` : observed.position ? ` -> state ${observed.position.position_state}` : ''}`);
+        } catch (error) {
+          current.status = 'ERROR';
+          current.observed = { error: error.message || String(error) };
+          run.index += 1;
+          setStatus(error.message || 'Event delivery failed.', 'error');
+          log(`ERROR: ${error.message || error}`);
+        } finally {
+          setBusy(false);
+          render();
+        }
+      }
+
+      function setReview(index, review) {
+        if (!run || !run.steps[index]) return;
+        run.steps[index].review = review;
+        render();
+      }
+
+      function render() {
+        const scenario = selectedScenario();
+        $('#scenario-description').textContent = scenario.description;
+        if (!run) {
+          stepsElement.innerHTML = '<div class="empty">Start a clean run to prepare the fixture and event ledger.</div>';
+          progressElement.textContent = 'No run active';
+          nextButton.disabled = true;
+          return;
+        }
+        progressElement.textContent = `${run.index}/${run.steps.length} delivered`;
+        nextButton.disabled = busy || run.index >= run.steps.length;
+        stepsElement.innerHTML = run.steps.map((entry, index) => renderStep(entry, index)).join('');
+        stepsElement.querySelectorAll('[data-review]').forEach((button) => {
+          button.addEventListener('click', () => setReview(Number(button.dataset.index), button.dataset.review));
+        });
+      }
+
+      function renderStep(entry, index) {
+        const expected = entry.definition.expected;
+        const isNext = index === run.index && entry.status === 'PENDING';
+        const classes = [ 'step', entry.status === 'PENDING' ? 'pending' : '', isNext ? 'active' : '' ].filter(Boolean).join(' ');
+        const observed = entry.observed || {};
+        const observedSummary = entry.status === 'PENDING'
+          ? 'Awaiting event'
+          : observed.error
+            ? observed.error
+            : observed.theme
+              ? `${expected.theme.stage.replaceAll('_', ' ')} ${expected.theme.signal}; ${expected.theme.securityScoped ? `${FIXTURE.ticker} evidence` : 'market evidence'}${observed.action ? `; ${String(observed.action.alert_type).replaceAll('_', ' ')} includes ${FIXTURE.symbol}` : ''}`
+            : `${observed.alert ? `${String(observed.alert.alert_type).replaceAll('_', ' ')} card${observed.alert.strength ? `; ${observed.alert.strength}` : ''}${observed.alert.timeframe ? ` ${observed.alert.timeframe}` : ''}${observed.alert.source ? `; ${observed.alert.source}` : ''}` : 'No new card'}${observed.action ? `; funded $${Number(observed.action.instruction_value || 0).toFixed(0)} ticket` : ''}${observed.position ? `; state ${observed.position.position_state}` : ''}`;
+        const label = entry.status === 'MATCH' ? 'Backend match' : entry.status === 'MISMATCH' ? 'Check mismatch' : entry.status === 'ERROR' ? 'Delivery error' : 'Pending';
+        const expectedLabel = expected.theme
+          ? `${expected.theme.stage.replaceAll('_', ' ')}; ${expected.theme.signal}${expected.theme.securityScoped ? `; ${FIXTURE.ticker}` : ''}${expected.theme.action ? `; ${expected.theme.action.alertType.replaceAll('_', ' ')} includes ${FIXTURE.symbol}` : ''}`
+          : `${expected.alertType ? `${expected.alertType.replaceAll('_', ' ')} card` : 'No card'}${expected.strength ? `; ${expected.strength}` : ''}${expected.timeframe ? ` ${expected.timeframe}` : ''}${expected.action ? `; funded $${expected.action.ticket} ticket` : ''}${expected.positionState ? `; state ${expected.positionState}` : ''}`;
+        const review = entry.review ? `<span class="state ${entry.review === 'PASS' ? 'match' : 'mismatch'}">${entry.review === 'PASS' ? 'Checked' : 'Flagged'}</span>` : entry.status === 'PENDING' ? '' : `<button class="pass" data-review="PASS" data-index="${index}">Check</button><button class="fail" data-review="FAIL" data-index="${index}">Flag</button>`;
+        return `<div class="${classes}" data-testid="step-${index + 1}">
+          <div class="number">${String(index + 1).padStart(2, '0')}</div>
+          <div><div class="step-title">${escapeHtml(entry.definition.title)}</div><div class="step-detail">${escapeHtml(entry.definition.description)}</div></div>
+          <div><div class="eyebrow">EXPECTED</div><div class="outcome">${escapeHtml(expectedLabel)}</div><div class="step-detail">${escapeHtml(expected.summary)}</div></div>
+          <div><div class="eyebrow">OBSERVED</div><div class="outcome">${escapeHtml(observedSummary)}</div><div class="state ${entry.status.toLowerCase()}">${label}</div></div>
+          <div class="review">${review}</div>
+        </div>`;
+      }
+
+      function setBusy(value) {
+        busy = value;
+        startButton.disabled = value;
+        $('#connect').disabled = value;
+        scenarioSelect.disabled = value;
+        render();
+      }
+
+      function escapeHtml(value) {
+        return String(value || '').replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]);
+      }
+
+      async function checkConnection() {
+        setBusy(true);
+        try {
+          await request('/alerts?includeHistory=true');
+          sessionStorage.setItem(TOKEN_KEY, token());
+          sessionStorage.setItem(API_KEY, apiBase());
+          setStatus('Authenticated UAT connection confirmed.');
+          log(`Connected to ${apiBase()}.`);
+        } catch (error) {
+          setStatus(error.message || 'Connection check failed.', 'error');
+          log(`ERROR: ${error.message || error}`);
+        } finally {
+          setBusy(false);
+        }
+      }
+
+      scenarios.forEach((scenario) => {
+        const option = document.createElement('option');
+        option.value = scenario.key;
+        option.textContent = `${scenario.title} (${scenario.steps.length} events)`;
+        scenarioSelect.append(option);
+      });
+      scenarioSelect.addEventListener('change', render);
+      startButton.addEventListener('click', prepareFixture);
+      nextButton.addEventListener('click', deliverNext);
+      $('#connect').addEventListener('click', checkConnection);
+      render();
+    })();
+  </script>
+</body>
+</html>

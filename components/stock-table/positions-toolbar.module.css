@@ -1,0 +1,25 @@
+.toolbarButton { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 4px; cursor: pointer; }
+.toolbarButton svg { width: 18px; height: 18px; }
+.menu { z-index: 180; width: min(292px, calc(100vw - 20px)); max-height: var(--radix-popover-content-available-height); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; padding: 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--popover); color: var(--popover-foreground); box-shadow: 0 8px 24px rgb(0 0 0 / 22%); font-family: var(--font-sans), sans-serif; font-size: 13px; line-height: 20px; letter-spacing: 0; outline: none; }
+.section + .section { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+/* Anchored menus must fit below their trigger, not use the full dialog viewport. */
+div.menu[role='dialog'] { max-height: min(var(--radix-popover-content-available-height), calc(100dvh - 20px)); }
+.heading { margin: 0 0 6px; padding: 0 8px; color: var(--foreground); font-family: inherit; font-size: 12px; line-height: 18px; font-weight: 500; text-transform: none; letter-spacing: 0; }
+.orderList { display: grid; gap: 2px; }
+.menu .orderOption { display: grid; grid-template-columns: 20px minmax(0, 1fr) 20px; align-items: center; gap: 6px; min-height: 36px; width: 100%; padding: 6px 8px; border: 0; border-radius: 4px; background: transparent; color: var(--foreground); font: inherit; text-align: left; letter-spacing: 0; text-transform: none; cursor: pointer; }
+.orderOption > span:first-child, .orderOption > span:last-child { display: grid; place-items: center; }
+.orderOption[aria-pressed='true'] { background: var(--panel-bg-alt); }
+.menu .orderOption:hover, .checkRow:hover, .menu .command:hover { background: var(--muted); }
+.segments { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px; padding: 2px; border: 1px solid var(--border); border-radius: 4px; }
+.menu .segments button { min-height: 34px; padding: 5px 8px; border: 0; border-radius: 2px; background: transparent; color: var(--muted-foreground); font: inherit; letter-spacing: 0; text-transform: none; cursor: pointer; }
+.menu .segments button[aria-pressed='true'] { background: var(--foreground); color: var(--background); }
+.menu .segments button:not([aria-pressed='true']):hover { background: var(--muted); color: var(--foreground); }
+.checkRow { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 36px; padding: 6px 8px; border-radius: 4px; color: var(--foreground); font: inherit; cursor: pointer; }
+.checkRow input { flex: none; width: 18px; height: 18px; margin: 0; accent-color: var(--primary); cursor: pointer; }
+.menu .command { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 36px; padding: 6px 8px; border: 0; border-radius: 4px; background: transparent; color: var(--foreground); font: inherit; letter-spacing: 0; text-transform: none; cursor: pointer; }
+.menu .groupCommand { justify-content: flex-start; }
+.menu button:focus-visible, .menu input:focus-visible, .toolbarButton:focus-visible { outline: 2px solid var(--foreground); outline-offset: 2px; }
+@media (pointer: coarse) {
+    .menu .orderOption, .menu .command, .checkRow { min-height: 42px; }
+    .menu .segments button { min-height: 40px; }
+}

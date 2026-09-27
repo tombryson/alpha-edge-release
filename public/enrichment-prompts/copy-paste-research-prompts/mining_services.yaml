@@ -1,0 +1,237 @@
+template_id: mining_services
+template_name: Mining Services
+category: industrials
+source_yaml: backend/templates/mining_services.yaml
+placeholders:
+  company_name: '[COMPANY_NAME]'
+  ticker: '[EXCHANGE_CODE]:[TICKER]'
+  exchange: '[EXCHANGE_CODE]'
+  instruction: Replace placeholders before pasting into an external model interface.
+generation_source:
+  generated_by: scripts/export_copy_paste_analysis_prompts.py
+  source_of_truth: backend/templates/*.yaml plus backend/template_loader.py
+  copy_paste_prompt_renderer: TemplateLoader.get_copy_paste_research_brief(..., include_rubric=True)
+  core_rubric_renderer_used_inside_prompt: TemplateLoader.render_copy_paste_rubric(...) / fallback rubric builder
+company_types:
+- mining_services
+scoring_factors:
+  quality:
+  - Revenue Visibility
+  - Contract Quality
+  - Utilisation and Execution
+  - Cash Conversion
+  - Balance Sheet
+  - Customer and Commodity Diversification
+  value:
+  - Normalized Earnings vs Market Cap
+  - EV/EBITDA vs Cycle and Peers
+  - FCF Yield
+  - Fleet/Asset Replacement Value
+  - Strategic Value
+usage:
+  copy_this_field: copy_paste_prompt
+  note: Generated manual-use copy/paste prompt.
+copy_paste_prompt: |-
+  Investment analysis prompt:
+  - Template: mining_services
+  - Company name: [COMPANY_NAME].
+  - Company type: mining_services.
+  - Exchange: [EXCHANGE_CODE].
+  - Keep outputs decision-grade, evidence-linked, and explicit about assumptions.
+
+  - Run a dedicated sector lane (mining services): capture 2-4 recent sources on mining capex, exploration drilling, production activity, contract mining demand, equipment utilisation, labour availability, and commodity-exposed customer budgets; tie each point to scenario assumptions.
+  - Run a customer-cycle lane: identify the company's key commodity and customer exposures, contract renewals, project starts/stops, tender pipeline, order book, pricing, margin, and working-capital risk.
+  Exchange assumptions:
+  Exchange profile: listing venue not preselected. Infer filing sources from the company's exchange, domicile, regulator, and primary documents; do not assume one exchange-specific filing format by default.
+
+  Analysis rubric:
+  Run an investment analysis on [COMPANY_NAME] using this mining-services rubric. If data is unavailable, state the gap, explain whether it matters to valuation, and continue. Do not penalise missing disclosure unless the missing item is material to contract quality, utilisation, margins, cash conversion, fleet intensity, customer concentration, balance-sheet risk, or scenario confidence.
+
+  Use this template for contract mining, mineral drilling, blast-hole drilling, blasting/explosives, mining equipment hire, mine-site services, maintenance, camps/logistics, and mining EPCM/service providers. Do not treat the company as a miner unless it owns the resource, reserve, mine, or commodity production economics itself.
+
+  The centre of the analysis is not resource tonnes or commodity ownership. It is service earnings quality: contract duration, customer budgets, utilisation, pricing, margins, working capital, fleet intensity, safety, and exposure to mining capex/opex cycles.
+
+  First classify the business:
+  * Contract mining: value driven by contract duration, mobilisation/demobilisation, fleet intensity, cost pass-through, customer concentration, claims, margin discipline, and renewal risk.
+  * Drilling services: value driven by rig count, rig utilisation, metres drilled, day rates, exploration/development budgets, labour availability, safety, and fleet productivity.
+  * Blasting/explosives/mining consumables: value driven by mine production volumes, pricing formulas, ammonium nitrate/input costs, reliability, safety, regulation, and customer mine plans.
+  * Equipment hire and maintenance: value driven by fleet age, utilisation, rental rates, residual value, maintenance intensity, capex cycle, and customer mine activity.
+  * Mine-site services/camps/logistics: value driven by recurring site activity, contract tenor, labour availability, service density, customer concentration, and pricing discipline.
+  * Mining EPCM / engineering services: value driven by project pipeline, tender wins, billable utilisation, staff retention, change orders, project execution, and customer capital budgets.
+  * Hybrid provider: separate each earnings stream rather than applying one blended multiple.
+
+  Use that classification to decide valuation emphasis:
+  * Asset-light service models: EV/EBIT, FCF yield, and organic growth adjusted for utilisation, labour margins, customer retention, and working capital.
+  * Fleet-heavy models: EV/EBITDA and FCF after maintenance capex, with explicit fleet replacement-cycle, utilisation, debt/lease, and residual-value checks.
+  * Contract mining: normalized EBIT/FCF with explicit adjustment for mobilisation costs, demobilisation risk, contract assets/liabilities, claims, and working capital.
+  * Drilling services: cycle-normalised EBITDA/EBIT, rig utilisation, day rates, fleet age, metres drilled, safety, labour availability, and exploration/development budget exposure.
+  * Consumables/explosives: cycle-normalized margins, pricing spread, input-cost pass-through, capacity/reliability, production-volume linkage, and safety/regulatory risk.
+  * EPCM/engineering: backlog, billable utilisation, employee capacity, tender conversion, change orders, working capital, and fixed-price/execution risk.
+  * Do not give premium value to backlog unless margin quality, counterparty quality, cancellation/deferral risk, and cash conversion are visible.
+
+  Include:
+  * 12-month and 24-month price targets with bull/base/bear scenarios.
+  * Quality and Value scores out of 100 using the formulas and scoring tables below.
+  * Operating summary and timeline to material contract, utilisation, guidance, balance-sheet, customer-budget, safety, capex, or strategic milestones.
+  * Quantitative and qualitative headwinds/tailwinds with explicit thresholds and directional valuation impact.
+  * Investment recommendation (BUY/HOLD/SELL), conviction (HIGH/MEDIUM/LOW), and one-paragraph justification.
+  * Monitoring watchlist and thesis map with measurable conditions the scenario router can evaluate later.
+  * Verification queue for missing contract, utilisation, margin, cash-flow, capex, fleet, or customer concentration data.
+
+  Data sourcing rules:
+  * If source documents are not attached, actively retrieve and review primary sources before analysis.
+  * Source market data from official exchange sources, regulator filings, and reliable market-data providers for the listing venue.
+  * Source revenue, contract, utilisation, margin, fleet, safety, working-capital, capex, debt, lease, customer, and balance-sheet data from the company's primary exchange filings plus annual/interim reports, quarterly updates, investor presentations, contract announcements, operating updates, financing announcements, and substantial-holder notices.
+  * Prefer primary sources: exchange filings, statutory reports, customer/contract announcements, order-book/backlog tables, fleet and utilisation commentary, segment notes, debt/refinancing disclosures, safety/regulator records, and customer mine/project disclosures where relevant.
+  * Use secondary sources only where they add factual context on mining capex, exploration drilling, mine production activity, commodity customer budgets, labour availability, equipment demand, or competitor pricing. Label secondary-source facts clearly.
+  * For every key numeric input used in valuation, Quality, Value, price targets, revenue, EBITDA/EBIT, FCF, order book, margins, utilisation, rig/fleet count, working capital, debt, lease liabilities, maintenance capex, or cash-flow analysis, provide:
+    1) value used
+    2) source URL + document date
+    3) ESTIMATE tag with one-line justification if inferred.
+  * Use current listing currency market data and relevant base-currency FX conversion where project economics are reported in a different currency; state source and timestamp.
+  * Do not use broker target prices or consensus estimates as primary evidence. They may be cited only as secondary context.
+
+  Document review (complete before valuation):
+  For each major valuation-relevant document (annual/interim report, quarterly update, investor presentation, technical report, financing update, operating update, regulatory filing, or material announcement), provide:
+  * Document title/date/announcement reference.
+  * 4-6 extracted key points.
+  * Relevance to valuation inputs (what changed and why it matters).
+  * Implications for investment outlook (positives and negatives).
+  * Market pricing assessment: one separate paragraph on whether market pricing appears to reflect the document's information.
+
+  Step 1: Business Model and Earnings-Quality Workup
+  For each material segment, customer group, contract stream, or earnings stream, capture where disclosed:
+  * Segment/business line name, service type, geography, customer type, commodity exposure, contract model, and next milestone.
+  * Revenue model: recurring contract, transactional project work, consumables, equipment rental, maintenance, EPCM/engineering, pass-through revenue, or hybrid.
+  * Demand drivers: customer mine production, exploration drilling, development capex, sustaining mine opex, mine expansions, tender pipeline, pricing/rates, utilisation, and labour/equipment availability.
+  * Cost structure: labour, subcontractors, fuel, steel, ammonium nitrate/input costs, fleet maintenance, depreciation, leases, mobilisation, demobilisation, and fixed-cost burden.
+  * Growth levers: contract wins, renewals/extensions, utilisation uplift, fleet expansion, rate/pricing improvement, margin recovery, customer mine expansion, bolt-on M&A, or cost-out.
+
+  Revenue visibility and contract discipline:
+  * Establish the current revenue baseline from the latest half, quarter, or run-rate.
+  * Distinguish recurring contract revenue, project revenue, consumables revenue, equipment rental, pass-through revenue, and one-off revenue. Do not treat them as equivalent.
+  * Assess order book/backlog, contract tenor, renewal dates, cancellation/deferral rights, customer concentration, commodity exposure, margin quality, mobilisation status, and tender pipeline.
+  * For contract mining and EPCM, explicitly assess fixed-price exposure, claims/change orders, margin recognition, cost pass-through, and cash conversion.
+  * Do not award high-quality multiples to headline backlog if margin visibility, cancellation risk, counterparty quality, or cash conversion is poor.
+
+  Utilisation, fleet, and operating execution:
+  * Capture rig/fleet count, utilisation, metres drilled, day rates/rental rates, downtime, productivity, fleet age, maintenance capex, and growth capex where disclosed.
+  * Separate maintenance capex from growth capex. Fleet-heavy companies can show strong EBITDA while consuming cash in replacement capex.
+  * Assess whether utilisation is cyclical recovery, structural share gain, customer-specific mobilisation, or temporary catch-up work.
+  * For drilling and equipment hire, state whether the current fleet can support bull-case revenue or whether capex/labour must be added.
+  * For explosives/consumables, assess reliability, capacity, input-cost pass-through, safety/regulatory constraints, and customer mine production volumes.
+
+  Cash conversion, working capital, and balance-sheet discipline:
+  * Reconcile EBITDA/EBIT to operating cash flow and free cash flow.
+  * Identify mobilisation costs, contract assets/liabilities, inventory, receivables/debtor days, claims, bad debts, lease liabilities, equipment finance, and covenant headroom.
+  * State whether earnings are cash-backed or working-capital intensive.
+  * Assess dividend/buyback policy, acquisition appetite, debt maturity, refinancing risk, and ability to fund growth fleet/capex without dilution.
+  * Do not ignore working capital: mining-services earnings often look healthy before receivables, mobilisation costs, inventory, contract assets, and capex absorb cash.
+
+  Customer-cycle and commodity-budget exposure:
+  * Map key customers, commodities, regions, mine types, and budget categories.
+  * Distinguish exposure to exploration capex, development capex, sustaining mine opex, production volumes, mine expansions, and closure/rehabilitation activity.
+  * Identify whether the exposed customer budgets are improving, stable, weakening, or dependent on a narrow commodity/customer set.
+  * Do not treat mining-services revenue as direct commodity exposure. Service companies can benefit from mining activity while still suffering margin pressure, labour shortages, bad debt, or customer deferrals.
+  * Do not penalise the absence of JORC resource data for a pure service company. Resource data matters only through customer budget and project activity exposure.
+
+  Management, safety, and governance:
+  * Assess management's record on contract bidding discipline, margin delivery, safety, working-capital control, fleet allocation, M&A integration, leverage, and capital returns.
+  * Capture safety metrics such as TRIFR/LTIFR/LTI where available, and state whether safety performance is improving or deteriorating.
+  * Review insider ownership, related-party exposure, capital allocation, remuneration, acquisitions/divestments, and any governance red flags.
+  * For roll-ups or acquisition-led models, separate organic growth from acquired growth and assess integration/culture risk.
+
+  Step 2: Valuation Workup
+  * State the primary valuation anchor and why it is appropriate.
+  * Cross-check with at least one secondary method.
+  * Normalize earnings or cash flow where cycle position, one-offs, commodity customer budgets, rates, labour costs, acquisitions, FX, working capital, capex, or contract timing distort the current period.
+  * Explain whether EBITDA, EBIT, earnings, FCF, backlog, fleet value, or replacement value overstates or understates owner earnings.
+  * For fleet-heavy models, explicitly adjust for maintenance capex, leases/equipment finance, residual value, and fleet replacement needs.
+  * For asset-light models, test whether high margins are durable or simply a temporary labour/pricing cycle.
+  * Do not let peer multiples override company-specific evidence on utilisation, contract quality, leverage, cash conversion, safety, customer concentration, governance, or cycle exposure.
+
+  Valuation methods to consider:
+  * EV/EBITDA, EV/EBIT, P/E, and FCF yield versus relevant service peers and cycle position.
+  * Normalized earnings power versus market cap and enterprise value.
+  * Backlog/order-book value only where margin, conversion, cancellation risk, and customer quality are visible.
+  * Fleet/replacement value only as a cross-check, not a substitute for cash-flow quality.
+  * Strategic value where there is credible scale, customer access, fleet/specialist capability, scarce labour capability, or acquisition appeal.
+
+  Step 3: Quality Score (0-100)
+  Score the company explicitly across these factors. Show raw score, weighting, weighted contribution, and a short evidence-based reason for each.
+
+  Quality factor weightings:
+  * Revenue Visibility: 20%
+  * Contract Quality: 20%
+  * Utilisation and Execution: 15%
+  * Cash Conversion: 15%
+  * Balance Sheet: 15%
+  * Customer and Commodity Diversification: 15%
+
+  Quality scoring formula:
+  * Quality Score = sum(weighted factor scores), 0-100.
+
+  Quality grading bands:
+  * 85-100: top-tier service business with durable contracts, strong utilisation, cash-backed earnings, resilient balance sheet, strong safety culture, and diversified customers.
+  * 70-84: good business with clear strengths and manageable cycle/execution risks.
+  * 50-69: mixed quality; attractive demand offset by utilisation, margin, working-capital, leverage, safety, customer, or disclosure risks.
+  * Below 50: weak economics, poor cash conversion, high leverage, customer concentration, safety/execution issues, or weak evidence.
+
+  Step 4: Value Score (0-100)
+  Score the company explicitly across these factors. Show raw score, weighting, weighted contribution, and a short evidence-based reason for each.
+
+  Value factor weightings:
+  * Normalized Earnings vs Market Cap: 30%
+  * EV/EBITDA vs Cycle and Peers: 20%
+  * FCF Yield: 20%
+  * Fleet/Asset Replacement Value: 15%
+  * Strategic Value: 15%
+
+  Value scoring formula:
+  * Value Score = sum(weighted factor scores), 0-100.
+
+  Value grading bands:
+  * 85-100: materially undervalued relative to normalized earnings, cash generation, asset value, and risk.
+  * 70-84: undervalued with clear upside and manageable cycle/execution risks.
+  * 50-69: roughly fair value or upside offset by risk.
+  * Below 50: expensive, weakly supported by fundamentals, or dependent on unsupported cycle/margin assumptions.
+
+  Step 5: Scenario Framework and Price Targets
+  Provide bull, base, and bear cases with:
+  * 12M target and 24M target.
+  * Probability for each scenario.
+  * Short description of what operationally changes.
+  * Current positioning (bull-leaning, base-leaning, mixed, bear-leaning).
+  * Explicit conditions that must hold.
+  * Explicit failure conditions.
+
+  Scenario design rules:
+  * Bull/base/bear must differ by utilisation, contract wins/losses, margins, cash conversion, customer budget cycle, balance sheet, and valuation evidence, not only by exit multiple.
+  * Tie each scenario to measurable trigger conditions the scenario router can later monitor.
+  * State which assumptions are known, estimated, or disputed.
+  * Probability-weighted targets must reconcile to the scenario targets and probabilities.
+
+  Step 6: Thesis Map, Timeline, Monitoring Watchlist, and Verification Queue
+  Build a thesis map with:
+  * Bull conditions: measurable contract, utilisation, margin, cash-flow, balance-sheet, customer-budget, or strategic evidence that would strengthen the thesis.
+  * Base conditions: measurable evidence required for the current thesis to remain intact.
+  * Bear/failure conditions: contract loss, customer deferral, utilisation drop, margin compression, poor cash conversion, safety incident, covenant stress, capex blowout, dilution, or governance failure that would weaken/break the thesis.
+
+  Build a 24M timeline with:
+  * Contract starts/renewals, mobilisation/demobilisation, tender awards, guidance updates, customer project approvals, margin/cash-flow milestones, refinancing/covenant milestones, fleet capex, and strategic reviews where relevant.
+  * Status for each milestone: achieved, planned, at-risk, delayed, speculative, or failed.
+
+  Build a monitoring watchlist with:
+  * 5-10 concrete checks the scenario router can evaluate from future announcements.
+  * Each check should have a topic, threshold/condition, expected source type, and thesis impact.
+
+  Build a verification queue with:
+  * Missing or uncertain contract, utilisation, margin, cash-conversion, capex, lease/debt, customer concentration, safety, or guidance data.
+  * For each item, state why it matters and which document/source would resolve it.
+
+  Cross-check requirements before final output:
+  * Ensure scenario targets reconcile to current share count, enterprise value, net debt/cash, lease liabilities, and currency.
+  * Ensure valuation does not double-count cash, debt, leases, fleet value, capex, acquisition synergies, backlog, or one-off earnings.
+  * Ensure Quality and Value weighted totals equal stated final scores.
+  * Ensure missing data is handled as a verification item, not as a silent assumption.
+  * Ensure the analysis does not accidentally apply a miner/resource-owner framework to a service company.

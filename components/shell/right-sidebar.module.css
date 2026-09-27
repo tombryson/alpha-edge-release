@@ -1,0 +1,30 @@
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    background: var(--panel-bg);
+    color: var(--foreground);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.workspace {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.summaryDock {
+    flex: none;
+    min-width: 0;
+    min-height: 0;
+    max-height: 50%;
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+}

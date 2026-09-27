@@ -1,0 +1,69 @@
+/* Shared class icons in Positions and Analysis; financial states stay intact. */
+table tbody tr.row td .iconSlot {
+    display: inline-block; position: relative; vertical-align: middle;
+    width: 25px; height: 0; overflow: visible;
+}
+table tbody tr.row td .iconTrigger {
+    position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 22px; flex: 0 0 24px; padding: 0; margin: 0;
+    border: 0; border-radius: 3px; color: var(--foreground); background: transparent; cursor: pointer;
+    user-select: none; touch-action: manipulation;
+}
+table tbody tr.row td .iconTrigger:hover,
+table tbody tr.row td .iconTrigger[data-icon-mode='selector'] { background: var(--muted); }
+table tbody tr.row td .iconTrigger svg { width: 16px; height: 16px; flex-shrink: 0; color: var(--foreground); pointer-events: none; }
+table tbody tr.row td .iconTrigger[data-icon-colour='class'] svg { color: var(--row-accent); }
+table tbody tr.row td .iconTrigger svg[data-row-disclosure] { width: 10px; height: 10px; }
+/* Custom icons (and the selector pencil) are 16px, far taller than the class
+   name's capitals, and hang ~3px below the baseline when centred on the line
+   box. A 2px lift balances them against the text (visually tuned; 3px read as
+   too high). Positions only: Analysis headings use a larger type scale. */
+table tbody tr.row:not(.analysisRow) td .iconTrigger:has(> svg:not([data-row-disclosure])) {
+    transform: translateY(calc(-50% - 2px));
+}
+table tbody tr.analysisRow td .iconSlot { width: 23px; flex: 0 0 23px; vertical-align: middle; }
+.iconTrigger:focus-visible { outline: 2px solid var(--foreground); outline-offset: 1px; }
+div.iconPicker[role='dialog'] {
+    z-index: 1601; width: min(320px, calc(100vw - 24px)); padding: 12px;
+    max-height: min(480px, calc(100dvh - 24px), var(--radix-popover-content-available-height));
+    display: flex; flex-direction: column; overflow: hidden;
+    border: 1px solid var(--border); border-radius: 6px;
+    background: linear-gradient(var(--panel-bg), var(--panel-bg)), var(--background);
+    color: var(--foreground); box-shadow: 0 8px 24px rgb(0 0 0 / 24%);
+    font-size: 13px; line-height: 1.5; letter-spacing: 0;
+}
+.iconHeading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; font-size: 14px; font-weight: 500; overflow-wrap: anywhere; }
+.rowColourButton { width: 28px; height: 28px; flex: 0 0 28px; padding: 0; border: 1px solid var(--muted-foreground); border-radius: 4px; cursor: pointer; }
+.rowColourButton:hover { box-shadow: 0 0 0 2px var(--panel-bg), 0 0 0 3px var(--foreground); }
+.rowColourButton:disabled { opacity: .5; cursor: default; }
+.colourError { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; color: var(--negative, #ef4444); }
+.colourError button { margin-left: auto; padding: 4px 8px; border: 1px solid var(--border); border-radius: 4px; color: var(--foreground); background: var(--panel-bg-alt); }
+.iconPicker button:focus-visible { outline: 2px solid var(--foreground); outline-offset: 2px; }
+.iconSearch { display: flex; align-items: center; gap: 8px; flex-shrink: 0; min-height: 36px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--panel-bg-alt); }
+.iconSearch input { width: 100%; min-width: 0; padding: 0; border: 0; background: transparent; color: var(--foreground); font: inherit; outline: none; }
+.iconSearch input::placeholder { color: var(--muted-foreground); }
+.iconSearch:focus-within { outline: 2px solid var(--foreground); outline-offset: 1px; }
+.iconQuickChoices { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 10px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.iconQuickChoices .icons { grid-template-columns: repeat(2, 40px); flex-shrink: 0; }
+.iconColourChoices { display: flex; gap: 6px; flex-shrink: 0; }
+.iconColourOption { display: grid; place-items: center; width: 40px; height: 36px; padding: 0; border: 1px solid var(--border); border-radius: 4px; background: transparent; cursor: pointer; }
+.iconColourOption svg { width: 18px; height: 18px; color: var(--foreground); }
+.iconColourOption svg[data-row-disclosure], .iconOption svg[data-row-disclosure] { width: 12px; height: 12px; }
+.iconColourOption[value='class'] svg { color: var(--icon-class-colour); }
+.iconColourOption:hover { background: var(--panel-bg-alt); }
+.iconColourOption[data-state='checked'] { border-color: var(--foreground); background: var(--panel-bg-alt); }
+.iconResults { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 2px; }
+.iconGroup { margin-top: 12px; }
+.iconGroup h3 { margin: 0 0 8px; font-size: 12px; font-weight: 500; line-height: 1.4; color: var(--muted-foreground); text-transform: none; }
+.iconEmpty { margin: 12px 0; color: var(--muted-foreground); }
+
+.icons { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.iconOption { height: 36px; display: grid; place-items: center; border: 1px solid var(--border); border-radius: 4px; background: transparent; color: color-mix(in srgb, var(--foreground) 80%, var(--muted-foreground)); cursor: pointer; }
+.iconOption[aria-pressed='true'] { background: var(--panel-bg-alt); color: var(--foreground); border-color: var(--foreground); box-shadow: inset 0 0 0 1px var(--foreground); }
+.iconOption:hover { color: var(--foreground); background: var(--panel-bg-alt); }
+.error { margin: 12px 0 0; font-size: 13px; color: var(--negative, #ef4444); }
+@media (max-width: 540px) {
+    .iconOption, .iconColourOption { min-height: 40px; }
+    .rowColourButton { width: 32px; height: 32px; flex-basis: 32px; }
+}

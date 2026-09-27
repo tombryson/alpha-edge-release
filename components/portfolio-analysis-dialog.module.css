@@ -1,0 +1,49 @@
+.overlay { position: fixed; inset: 0; z-index: 11900; background: rgb(0 0 0 / 30%); }
+div.dialog[role='dialog'] {
+    position: fixed; z-index: 11901; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: min(560px, calc(100vw - 24px)); max-height: calc(100dvh - 32px);
+    display: flex; flex-direction: column; overflow: hidden; padding: 0;
+    border: 1px solid var(--border); border-radius: 6px;
+    background: var(--card); color: var(--foreground); box-shadow: 0 12px 40px rgb(0 0 0 / 24%);
+    font-size: 13px; line-height: 1.5; letter-spacing: 0; text-transform: none; text-align: left;
+}
+.header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+.title { margin: 0; font-size: 20px; font-weight: 500; line-height: 1.4; }
+.form { display: flex; flex-direction: column; min-height: 0; }
+.body { padding: 20px; overflow-y: auto; overscroll-behavior: contain; }
+.sectionHeading { display: flex; align-items: baseline; gap: 10px; }
+.sectionHeading h3 { margin: 0; font-size: 15px; font-weight: 500; }
+.sectionHeading span, .description { color: var(--muted-foreground); font-size: 12px; }
+.description { margin: 4px 0 12px; }
+.libraryStatus { min-height: 18px; color: var(--muted-foreground); font-size: 12px; }
+.brief { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.brief summary { cursor: pointer; font-weight: 500; padding: 8px 0; }
+.brief summary span { color: var(--muted-foreground); font-size: 12px; font-weight: 400; margin-left: 8px; }
+.briefFields { display: grid; gap: 12px; border: 0; padding: 8px 0; margin: 0; min-width: 0; }
+.briefFields label { display: grid; gap: 5px; min-width: 0; font-size: 12px; }
+.briefFields input, .briefFields select, .briefFields textarea { box-sizing: border-box; width: 100%; min-width: 0; padding: 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--background); color: var(--foreground); font: inherit; font-size: 14px; }
+.briefFields textarea { resize: vertical; }
+.briefGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.play label.include { flex-direction: row; align-items: center; gap: 8px; color: var(--foreground); }
+.play .include input { width: 14px; height: 14px; padding: 0; accent-color: var(--signal-info); }
+.play { min-width: 0; margin: 16px 0; padding: 12px 0 0; border: 0; border-top: 1px solid var(--border); }
+.play legend { padding: 0 8px 0 0; color: var(--muted-foreground); font-size: 12px; }
+.playHeading { display: flex; align-items: flex-end; gap: 8px; margin-bottom: 12px; }
+.play label { display: flex; flex: 1; flex-direction: column; gap: 5px; min-width: 0; font-size: 12px; }
+.play input, .play textarea { width: 100%; min-width: 0; padding: 8px 10px; border: 1px solid var(--border); border-radius: 4px; background: var(--background); color: var(--foreground); font: inherit; font-size: 14px; line-height: 1.5; }
+.play textarea { resize: vertical; min-height: 90px; }
+.button, .addButton, .iconButton { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; padding: 7px 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--card); color: var(--foreground); font: inherit; cursor: pointer; }
+.iconButton { flex-shrink: 0; width: 36px; height: 36px; padding: 0; border-color: transparent; background: transparent; }
+.addButton { border-color: transparent; padding-inline: 0; background: transparent; color: var(--signal-info); }
+.button:hover:not(:disabled), .iconButton:hover:not(:disabled) { background: var(--muted); }
+.addButton:hover:not(:disabled) { color: var(--foreground); }
+.primary { background: color-mix(in srgb, var(--signal-info) 68%, #000); color: #fff; border-color: transparent; }
+.primary:hover:not(:disabled) { background: color-mix(in srgb, var(--signal-info) 76%, #000); }
+.dialog button:disabled { opacity: 0.5; cursor: not-allowed; }
+.dialog button:focus-visible, .dialog input:focus-visible, .dialog textarea:focus-visible, .dialog select:focus-visible { outline: 2px solid var(--signal-info); outline-offset: 2px; }
+.footer { display: flex; flex-shrink: 0; justify-content: flex-end; gap: 10px; padding: 14px 20px; border-top: 1px solid var(--border); }
+.error { color: var(--destructive); margin: 12px 0 0; overflow-wrap: anywhere; }
+.spinner { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+@media (max-width: 480px) { .header, .body { padding: 16px; } .footer { padding: 12px 16px; } }

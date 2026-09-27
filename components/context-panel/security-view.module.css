@@ -1,0 +1,71 @@
+.security {
+    container: security-details / inline-size;
+    padding-inline: 4px;
+    --detail-label: color-mix(in srgb, var(--foreground) 76%, var(--panel-bg));
+    --detail-meta: color-mix(in srgb, var(--foreground) 66%, var(--panel-bg));
+    font-size: 13px;
+    line-height: 1.5;
+}
+.section { padding: 14px 0; border-bottom: 1px solid color-mix(in srgb, var(--foreground) 14%, var(--panel-bg)); }
+.section:last-child { border-bottom: 0; padding-bottom: 4px; }
+.section h3 { margin: 0 0 10px; font-size: 15px; font-weight: 500; line-height: 21px; }
+.section p { margin: 0; overflow-wrap: anywhere; }
+.sectionHeading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+.sectionHeading h3 { margin: 0; }
+.iconCommand { display: inline-grid; place-items: center; flex: none; width: 32px; height: 32px; border: 0; background: transparent; color: var(--info); cursor: pointer; }
+.iconCommand svg { width: 16px; height: 16px; }
+.iconCommand:hover { background: color-mix(in srgb, var(--foreground) 5%, transparent); }
+.identity { display: grid; gap: 4px; }
+.identity h3 { min-width: 0; margin: 0; font-size: 20px; font-weight: 500; line-height: 26px; overflow-wrap: anywhere; }
+.identityMeta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; }
+.ticker { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; color: var(--detail-label); font-size: 13px; line-height: 20px; }
+.exchange { color: var(--detail-meta); }
+.meta { color: var(--detail-meta); font-size: 12px; line-height: 18px; }
+.metrics { display: grid; margin: 0; }
+.metrics > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 12px; min-width: 0; padding: 5px 0; }
+.metrics dt { min-width: 0; color: var(--detail-label); font-size: 13px; line-height: 19px; overflow-wrap: anywhere; }
+.metrics dd { margin: 0; font-size: 15px; font-weight: 500; line-height: 21px; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.primaryMetrics { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: end; gap: 12px; margin: 18px 0 8px; }
+.primaryMetrics > div { display: block; padding: 0; }
+.primaryMetrics dt { font-size: 12px; line-height: 18px; }
+.primaryMetrics dd { margin-top: 2px; font-size: 16px; line-height: 24px; text-align: left; }
+.primaryMetrics > :first-child dd { font-size: 26px; line-height: 32px; }
+.readout { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 8px 12px; padding: 5px 0; font-size: 13px; line-height: 19px; }
+.readout > :first-child { min-width: 0; color: var(--detail-label); overflow-wrap: anywhere; }
+.readout > :last-child { max-width: 126px; text-align: right; font-weight: 500; font-variant-numeric: tabular-nums; }
+.signals .readout { grid-template-columns: max-content minmax(0, 1fr); align-items: start; }
+.signals .readout > :first-child { overflow-wrap: normal; }
+.signals .readout > :last-child { max-width: none; overflow-wrap: break-word; }
+.sources { display: grid; gap: 4px; margin-top: 12px; color: var(--detail-meta); font-size: 12px; line-height: 18px; }
+.sources p { margin: 0; }
+.sources dl { display: grid; gap: 4px; margin: 0; }
+.sources dl > div { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px; }
+.sources dd { margin: 0; font-variant-numeric: tabular-nums; }
+.researchNote { margin-top: 12px; border-top: 1px solid color-mix(in srgb, var(--foreground) 10%, var(--panel-bg)); }
+.researchNote summary { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 36px; padding: 6px 0; list-style: none; color: var(--foreground); font-size: 13px; font-weight: 500; cursor: pointer; }
+.researchNote summary::-webkit-details-marker { display: none; }
+.researchNote summary svg { flex: none; width: 16px; height: 16px; color: var(--detail-label); }
+.researchNote[open] summary svg { transform: rotate(180deg); }
+.researchNote summary:hover { color: var(--info); }
+.researchNote summary:focus-visible { outline: 2px solid var(--info); outline-offset: 2px; }
+.section .thesis { margin: 4px 0 12px; color: var(--detail-label); font-size: 13px; line-height: 20px; }
+.commands { display: flex; flex-wrap: wrap; gap: 0 16px; margin-top: 8px; }
+.command { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; max-width: 100%; padding: 5px 0; border: 0; border-radius: 2px; background: transparent; color: var(--info); font: inherit; font-size: 12px; font-weight: 500; line-height: 20px; text-align: left; cursor: pointer; }
+.command svg { flex: none; width: 14px; height: 14px; }
+.command:hover { text-decoration: underline; text-underline-offset: 3px; }
+.chartFrame { position: relative; width: 100%; min-width: 0; height: 218px; margin-top: 6px; }
+.chartHost { width: 100%; height: 100%; background: var(--surface-1); }
+.chartStatus { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 12px; background: var(--surface-1); color: var(--detail-label); font-size: 12px; line-height: 18px; text-align: center; }
+.chartSource { display: block; width: fit-content; margin-top: 6px; color: var(--detail-meta); font-size: 12px; line-height: 18px; }
+.chartSource:hover { color: var(--info); text-decoration: underline; }
+@container security-details (max-width: 230px) {
+    .primaryMetrics { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+    .primaryMetrics > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 12px; }
+    .primaryMetrics dd { margin: 0; text-align: right; }
+}
+@media (max-width: 767px) {
+    .security { padding-inline: 0; }
+    .command { min-height: 40px; }
+    .iconCommand { width: 40px; height: 40px; }
+    .researchNote summary { min-height: 40px; }
+}

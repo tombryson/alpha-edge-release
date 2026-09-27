@@ -1,0 +1,17 @@
+.editor { z-index: 180; width: 184px; max-width: calc(100vw - 24px); padding: 5px; border: 1px solid var(--panel-border); border-radius: 4px; background: var(--popover); color: var(--popover-foreground); box-shadow: 0 8px 20px #0004; font-size: 12px; line-height: 18px; }
+.grid { display: grid; grid-template-columns: 78px minmax(0, 1fr); gap: 4px; }
+.ratios, .roles { display: grid; border: 1px solid var(--panel-border); border-radius: 3px; overflow: hidden; }
+.roles { grid-template-rows: 1fr 1fr; }
+.editor button { border: 0; background: transparent; color: inherit; cursor: pointer; font-size: 12px; font-weight: 500; line-height: 18px; }
+.ratios button { display: grid; grid-template-columns: 18px 1fr; align-items: center; gap: 4px; min-height: 30px; padding: 4px 6px; text-align: left; font-variant-numeric: tabular-nums; }
+.check { display: grid; place-items: center; width: 18px; height: 18px; }
+.check svg { width: 13px; height: 13px; }
+.roles button { padding: 6px 4px; }
+.roles button + button { border-top: 1px solid var(--panel-border); }
+.ratios button[aria-checked="true"], .roles button[aria-pressed="true"] { color: var(--info); background: color-mix(in srgb, var(--info) 8%, transparent); }
+.editor button:hover { background: color-mix(in srgb, var(--foreground) 7%, transparent); }
+.editor button:focus-visible { outline: 2px solid var(--info); outline-offset: -2px; }
+.editor button:disabled { opacity: .45; cursor: default; }
+.management { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 5px; padding: 5px 3px 0; border-top: 1px solid var(--panel-border); color: var(--muted-foreground); }
+@media (pointer: coarse) { .ratios button { min-height: 40px; } }
+@media (max-width: 1023px) { .editor { z-index: 302; } }

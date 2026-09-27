@@ -1,0 +1,5 @@
+{
+  "market-direct": { "label": "Direct commodity bullish path", "nodes": ["Commodity"], "result": "Commodity BULL" },
+  "market-equity": { "label": "Producer equity bullish evidence path", "nodes": ["Equity", "Company", "Outperform"], "result": "Path open" },
+  "etf-allocation": { "label": "Core ETF allocation calculation", "nodes": ["Class budget", "Core ratio", "Momentum", "ETF target", "Trend gate"] }
+}
