@@ -5,7 +5,7 @@ go 1.26.0
 require (
 	github.com/go-webauthn/webauthn v0.18.1
 	github.com/gorilla/mux v1.8.1
-	github.com/mattn/go-sqlite3 v1.14.23
+	github.com/mattn/go-sqlite3 v1.14.52
 )
 
 require (
