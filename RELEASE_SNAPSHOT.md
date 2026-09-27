@@ -30,7 +30,8 @@ Fly configuration files are unconfigured public
 templates. No deployment credentials or connections are transferred, and existing
 hosted environments continue to use their original release process.
 
-The single-commit presentation does not remove historical copies, earlier public
+This repository begins with an initial release snapshot, followed by small
+verification corrections. It does not remove historical copies, earlier public
 releases or activity elsewhere.
 
 ## Verification
